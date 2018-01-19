@@ -120,7 +120,8 @@ void Move::workModeUpdatetxtBias()
         uiMove->manualMin->setText("-30");
         break;
     case MODE_CURRENT:
-        jointGetTAG_CURRENT_L(joint, &data32, 50, NULL);
+//        jointGetTAG_CURRENT_L(joint, &data32, 50, NULL);
+        jointGetCurrent(joint, (uint32_t *)&data32, 50, NULL);
         //uiMove->txtBias->setValue(data32); // 由当前实际电流更新手动控制中的偏移量，实际中处于0位的机械臂2关节突然掉下
         uiMove->txtBias->setValue(0); // 和上面注释的那句效果一样，不如就改成0
         uiMove->manualMax->setText("500");
@@ -130,7 +131,8 @@ void Move::workModeUpdatetxtBias()
         uint16_t udata16 = 0;
         jointGetSYS_REDU_RATIO(joint, &udata16, 50, NULL);
         //            qDebug() << udata16 << "dsfadsfa";
-        jointGetTAG_SPEED_L(joint, &data32, 50, NULL);
+//        jointGetTAG_SPEED_L(joint, &data32, 50, NULL);
+        jointGetSpeed(joint, (uint32_t *)&data32, 50, NULL);
         data32 = (data32 * 60.0/65536) / udata16;
         uiMove->txtBias->setValue(data32); // 由当前实际电流更新手动控制中的偏移量
         uiMove->manualMax->setText("20");
@@ -138,7 +140,10 @@ void Move::workModeUpdatetxtBias()
         break;
     }
     case MODE_POSITION:
-        jointGetTAG_POSITION_L(joint, &data32, 50, NULL);
+//        jointGetTAG_POSITION_L(joint, &data32, 50, NULL);
+        // 应该是实际位置,而不是目标位置
+//        jointGetPosition(joint, (uint32_t *)&data32, 50, NULL);
+        jointGetPosition(joint, (uint32_t *)&data32, 50, NULL);
         data32 = data32 * 360/65536;
         uiMove->txtBias->setValue(data32); // 由当前实际位置更新手动控制中的偏移量
         uiMove->manualMax->setText("90");

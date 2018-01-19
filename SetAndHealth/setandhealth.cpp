@@ -71,14 +71,14 @@ void SetAndHealth::myTimerSlot()
     uint16_t data_L = 0;
     uint16_t data_H = 0;
     // 读取速度
-    jointGetSpeed(joint,&data32,100,NULL);
-    jointGetSYS_REDU_RATIO(joint, &data16, 100, NULL); // 减速比
+    jointGetSpeed(joint,&data32,5,NULL);
+    jointGetSYS_REDU_RATIO(joint, &data16, 5, NULL); // 减速比
     data_L = (uint16_t)(data32 & 0xffff);
     data_H = (uint16_t)(data32>>16);
     float speed = (float) ((data_L + data_H * 65536) * 60.0 / 65536.0 / data16);
     uiSetAndHealth->speedLineEdit->setText(QString::number(speed, 'f', 2) + "rpm");
     // 读取电流
-    jointGetCurrent(joint, &data32, 100, NULL);
+    jointGetCurrent(joint, &data32, 5, NULL);
     data_L = (uint16_t)(data32 & 0xffff);
     data_H = (uint16_t)(data32>>16);
     double temp = data_L + (data_H * 65536);
@@ -93,31 +93,31 @@ void SetAndHealth::myTimerSlot()
 //        uiSetAndHealth->currentLineEdit->setText(QString::number((double)temp/1000, 'f', 2) + "A");
 //    }
     // 读取位置
-    jointGetPosition(joint, &data32, 100, NULL);
+    jointGetPosition(joint, &data32, 5, NULL);
     data_L = (uint16_t)(data32 & 0xffff);
     data_H = (uint16_t)(data32>>16);
     uiSetAndHealth->pOS_LLineEdit->setText(QString::number((double)data_L * 360.0 / 65536.0, 'f', 2) + "°");
     uiSetAndHealth->pOS_HLineEdit->setText(QString::number((short)data_H));
     // 读取温度
-    jointGetTemp(joint,&data16,100,NULL);
+    jointGetTemp(joint,&data16,5,NULL);
     uiSetAndHealth->tempLineEdit->setText(QString::number(static_cast<double>(data16) / 10, 'f', 1) + "°C");
     // 读取电压
-    jointGetVoltage(joint,&data16,100,NULL);
+    jointGetVoltage(joint,&data16,5,NULL);
     uiSetAndHealth->voltageLineEdit->setText(QString::number((double)data16 / 100, 'f', 2) + "V");
     // 读取编码器电池电压
-    jointGetBAT_VOLT(joint, &data16, 50, NULL);
+    jointGetBAT_VOLT(joint, &data16, 5, NULL);
     uiSetAndHealth->bATVoltLineEdit->setText(QString::number((double)data16 / 100, 'f', 2) + "V");
     // 更新三轴加速度,并显示
-    jointGetACC_X(joint, &data16, 50, NULL);
+    jointGetACC_X(joint, &data16, 5, NULL);
     uiSetAndHealth->accXLineEdit->setText(QString::number((short)data16) + "mg");
-    jointGetACC_Y(joint, &data16, 50, NULL);
+    jointGetACC_Y(joint, &data16, 5, NULL);
     uiSetAndHealth->accYLineEdit->setText(QString::number((short)data16) + "mg");
-    jointGetACC_Z(joint, &data16, 50, NULL);
+    jointGetACC_Z(joint, &data16, 5, NULL);
     uiSetAndHealth->accZLineEdit->setText(QString::number((short)data16) + "mg");
     // 更新编码器,并显示
-    jointGetMOT_MT_DAT(joint,&data16, 50, NULL);
+    jointGetMOT_MT_DAT(joint,&data16, 5, NULL);
     uiSetAndHealth->m_TurnLineEdit->setText(QString::number((short)data16));
-    jointGetMOT_ST_DAT(joint, &data16, 50, NULL);
+    jointGetMOT_ST_DAT(joint, &data16, 5, NULL);
     uiSetAndHealth->s_TurnLineEdit->setText(QString::number((double)data16 * 360.0/65536.0) + "°");
 }
 

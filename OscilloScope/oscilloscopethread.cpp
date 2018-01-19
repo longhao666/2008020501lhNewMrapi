@@ -195,13 +195,14 @@ void OscilloScopeThread::getData()
                     jointGetSCP_MASK_Addr_Value(JT->joint, &data_H, paintArea->showItems[i].Item + 1, 100, NULL);
 //                    data_L = jointGetmastValue(JT->joint, &data_L, paintArea->showItems[i].Item, 100, NULL);
 //                    data_H = jointGetmastValue(JT->joint, &data_H, paintArea->showItems[i].Item + 1, 100, NULL);
-                    if(data_L == 0 || data_H == 0) {
-                        continue;
-                    }
+//                    if(data_L == 0 || data_H == 0) {
+//                        continue;
+//                    }
                     double temp = data_L + (data_H * 65536);
-                    qDebug() << paintArea->showItems[i].Item << paintArea->showItems[i].Item + 1  << "-==================------------";
-                    qDebug() << data_L << data_H << temp << "-vff-----------------";
-
+#if 1
+                    qDebug() << paintArea->showItems[i].Item << paintArea->showItems[i].Item + 1;
+                    qDebug() << "data_L = " << data_L << "data_H = " << data_H << "temp = " << temp;
+#endif
                     switch (paintArea->showItems[i].Item) {
                     case SCP_TAGCUR_L://(showItems[0].Item)://TAG_CURRENT_L:
                     case SCP_MEACUR_L://showItems[3].Item://SYS_CURRENT_L://若曲线是电流
