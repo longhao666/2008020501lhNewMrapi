@@ -3,6 +3,7 @@
 #include <vector>
 #include "oscilloscopethread.h"
 #include "oscilloscope.h"
+#include "joint.h"
 
 using std::vector;
 
@@ -123,31 +124,24 @@ void OscilloScopeThread::changeRlCUR()
 void OscilloScopeThread::setMask()
 {
     // 向下位机请求数据
-//    uint8_t data[2] = {0,0};
-//    data[1] = (uint8_t)( (paintArea->Mask & 0xff00) >> 8 );
-//    data[0] = (uint8_t)( paintArea->Mask & 0xff );
+    uint8_t data[2] = {0,0};
+    data[1] = (uint8_t)( (paintArea->Mask & 0xff00) >> 8 );
+    data[0] = (uint8_t)( paintArea->Mask & 0xff );
 
-    uint16_t data16 = paintArea->Mask;
-//    qDebug() << data16 << "dfdfd44444444444444444";
-    uint8_t data_L = 0;
-    uint8_t data_H = 0;
-    data_L = (uint8_t)(data16 & 0xff);
-    data_H = (uint8_t)(data16 >> 8);
-//    qDebug() << data_L << data_H << "dfdf,,,,,,,,,,,,,,,,,,";
     OscilloScope * JT = static_cast<OscilloScope *>(view);
 //    JT->can1->controller.SendMsg( JT->jointBeingUsed->ID,
 //                                  CMDTYPE_WR_NR,
 //                                  SCP_MASK,
 //                                  data,
 //                                  2 );
-    jointSetScpMask(JT->joint, data16, 100, NULL);
 //    JT->can1->controller.SendMsg( JT->jointBeingUsed->ID,
 //                                  CMDTYPE_RD,
 //                                  SCP_MASK,
 //                                  NULL,
 //                                  0x02 );
-    jointGetSCP_MASK(JT->joint, &data16, 100, NULL);
-//    JT->can1->controller.delayMs(5);
+    jointSet(SCP_MASK, 2, (Joint *)JT->joint, (void *)data, 50, NULL);
+    jointGet(SCP_MASK, 2, (Joint *)JT->joint, NULL, 50, NULL);
+//    JT->can1->controller.delayMs(50);
 }
 
 void OscilloScopeThread::getData()
@@ -191,15 +185,15 @@ void OscilloScopeThread::getData()
 //                    data_H = addrValue[i+1];
                     uint16_t data_L = 0;
                     uint16_t data_H = 0;
-                    jointGetSCP_MASK_Addr_Value(JT->joint, &data_L, paintArea->showItems[i].Item, 100, NULL);
-                    jointGetSCP_MASK_Addr_Value(JT->joint, &data_H, paintArea->showItems[i].Item + 1, 100, NULL);
-//                    data_L = jointGetmastValue(JT->joint, &data_L, paintArea->showItems[i].Item, 100, NULL);
-//                    data_H = jointGetmastValue(JT->joint, &data_H, paintArea->showItems[i].Item + 1, 100, NULL);
+//                    jointGetSCP_MASK_Addr_Value(JT->joint, &data_L, paintArea->showItems[i].Item, 100, NULL);
+                    jointSet(paintArea->showItems[i].Item, 2, (Joint *)JT->joint, (void *)data_L, 50, NULL);
+//                    jointGetSCP_MASK_Addr_Value(JT->joint, &data_H, paintArea->showItems[i].Item + 1, 100, NULL);
+                    jointSet(paintArea->showItems[i].Item, 2, (Joint *)JT->joint, (void *)data_L, 50, NULL);
 //                    if(data_L == 0 || data_H == 0) {
 //                        continue;
 //                    }
                     double temp = data_L + (data_H * 65536);
-#if 1
+#if 0
                     qDebug() << paintArea->showItems[i].Item << paintArea->showItems[i].Item + 1;
                     qDebug() << "data_L = " << data_L << "data_H = " << data_H << "temp = " << temp;
 #endif
@@ -215,7 +209,8 @@ void OscilloScopeThread::getData()
 
 //
                         uint16_t data16 = 0;
-                        jointGetSYS_REDU_RATIO(JT->joint, &data16, 50, NULL);
+//                        jointGetSYS_REDU_RATIO(JT->joint, &data16, 50, NULL);
+                        jointSet(SYS_REDU_RATIO, 2, (Joint *)JT->joint, (void *)data16, 50, NULL);
 //                        qDebug("fdfd%d",data16);
                         temp /= data16;
                         break;

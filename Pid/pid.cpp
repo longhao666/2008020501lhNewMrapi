@@ -1,6 +1,7 @@
 #include "pid.h"
 #include "ui_pid.h"
 #include <QDebug>
+#include "joint.h"
 
 #define LHDEBUG 0
 
@@ -27,8 +28,12 @@ void Pid::pidInit(int ID)
 {
 #if LHDEBUG
     qDebug() <<__DATE__<<__TIME__<<__FILE__<<__LINE__<<__func__;
+
 #endif
-    this->joint = jointGetJoint(ID);
+#if 0
+    qDebug() << "ID = " << ID;
+#endif
+    this->joint = jointSelect(ID);
     if(!joint) {
         return ;
     }
@@ -46,37 +51,37 @@ void Pid::showSEVPID()
     }
     uint16_t data16 = 0;
     // 位置环P
-    jointGetPositionP(joint, &data16, 100, NULL);
+    jointGet(S_POSITION_P, 2, (Joint *)joint, (void *)&data16, 50, NULL);
     uiPid->POS_PSpinBox->setValue(data16);
     // 位置环I
-    jointGetS_POSITION_I(joint, &data16, 100, NULL);
+    jointGet(S_POSITION_I, 2, (Joint *)joint, (void *)&data16, 50, NULL);
     uiPid->POS_ISpinBox->setValue(data16);
     // 位置环D
-    jointGetS_POSITION_D(joint, &data16, 100, NULL);
+    jointGet(S_POSITION_D, 2, (Joint *)joint, (void *)&data16, 50, NULL);
     uiPid->POS_DSpinBox->setValue(data16);
     // 位置死区
-    jointGetPositionDs(joint, &data16, 100, NULL);
+    jointGet(S_POSITION_DS, 2, (Joint *)joint, (void *)&data16, 50, NULL);
     uiPid->POS_DSSpinBox->setValue(data16);
-    // 速度环P
-    jointGetSpeedP(joint, &data16, 100, NULL);
+    // 速度环P;
+    jointGet(S_SPEED_P, 2, (Joint *)joint, (void *)&data16, 50, NULL);
     uiPid->SPD_PSpinBox->setValue(data16);
     // 速度环I
-    jointGetSpeedI(joint, &data16, 100,NULL);
+    jointGet(S_SPEED_I, 2, (Joint *)joint, (void *)&data16, 50, NULL);
     uiPid->SPD_ISpinBox->setValue(data16);
     // 速度环D
-    jointGetS_SPEED_D(joint, &data16, 100, NULL);
+    jointGet(S_SPEED_D, 2, (Joint *)joint, (void *)&data16, 50, NULL);
     uiPid->SPD_DSpinBox->setValue(data16);
     // 速度死区
-    jointGetS_SPEED_DS(joint, &data16, 100, NULL);
+    jointGet(S_SPEED_DS, 2, (Joint *)joint, (void *)&data16, 50, NULL);
     uiPid->SPD_DSSpinBox->setValue(data16);
     // 电流环P
-    jointGetCurrP(joint, &data16, 100, NULL);
+    jointGet(S_CURRENT_P, 2, (Joint *)joint, (void *)&data16, 50, NULL);
     uiPid->CUR_PSpinBox->setValue(data16);
     // 电流环I
-    jointGetCurrI(joint, &data16, 100, NULL);
+    jointGet(S_CURRENT_I, 2, (Joint *)joint, (void *)&data16, 50, NULL);
     uiPid->CUR_ISpinBox->setValue(data16);
     // 电流环D
-    jointGetS_CURRENT_D(joint, &data16, 100, NULL);
+    jointGet(S_CURRENT_D, 2, (Joint *)joint, (void *)&data16, 50, NULL);
     uiPid->CUR_DSpinBox->setValue(data16);
 }
 
@@ -89,37 +94,38 @@ void Pid::showMPID()
         return ;
     }
     uint16_t data16 = 0;
-    jointGetM_POSITION_P(joint, &data16, 100, NULL);
+    // 位置环P
+    jointGet(M_POSITION_P, 2, (Joint *)joint, (void *)&data16, 50, NULL);
     uiPid->POS_PSpinBox->setValue(data16);
     // 位置环I
-    jointGetM_POSITION_I(joint, &data16, 100, NULL);
+    jointGet(M_POSITION_I, 2, (Joint *)joint, (void *)&data16, 50, NULL);
     uiPid->POS_ISpinBox->setValue(data16);
     // 位置环D
-    jointGetM_POSITION_D(joint, &data16, 100, NULL);
+    jointGet(M_POSITION_D, 2, (Joint *)joint, (void *)&data16, 50, NULL);
     uiPid->POS_DSpinBox->setValue(data16);
     // 位置死区
-    jointGetM_POSITION_DS(joint, &data16, 100, NULL);
+    jointGet(M_POSITION_DS, 2, (Joint *)joint, (void *)&data16, 50, NULL);
     uiPid->POS_DSSpinBox->setValue(data16);
-    // 速度环P
-    jointGetM_SPEED_P(joint, &data16, 100, NULL);
+    // 速度环P;
+    jointGet(M_SPEED_P, 2, (Joint *)joint, (void *)&data16, 50, NULL);
     uiPid->SPD_PSpinBox->setValue(data16);
     // 速度环I
-    jointGetM_SPEED_I(joint, &data16, 100,NULL);
+    jointGet(M_SPEED_I, 2, (Joint *)joint, (void *)&data16, 50, NULL);
     uiPid->SPD_ISpinBox->setValue(data16);
     // 速度环D
-    jointGetM_SPEED_D(joint, &data16, 100, NULL);
+    jointGet(M_SPEED_D, 2, (Joint *)joint, (void *)&data16, 50, NULL);
     uiPid->SPD_DSpinBox->setValue(data16);
     // 速度死区
-    jointGetM_SPEED_DS(joint, &data16, 100, NULL);
+    jointGet(M_SPEED_DS, 2, (Joint *)joint, (void *)&data16, 50, NULL);
     uiPid->SPD_DSSpinBox->setValue(data16);
     // 电流环P
-    jointGetM_CURRENT_P(joint, &data16, 100, NULL);
+    jointGet(M_CURRENT_P, 2, (Joint *)joint, (void *)&data16, 50, NULL);
     uiPid->CUR_PSpinBox->setValue(data16);
     // 电流环I
-    jointGetM_CURRENT_I(joint, &data16, 100, NULL);
+    jointGet(M_CURRENT_I, 2, (Joint *)joint, (void *)&data16, 50, NULL);
     uiPid->CUR_ISpinBox->setValue(data16);
     // 电流环D
-    jointGetM_CURRENT_D(joint, &data16, 100, NULL);
+    jointGet(M_CURRENT_D, 2, (Joint *)joint, (void *)&data16, 50, NULL);
     uiPid->CUR_DSpinBox->setValue(data16);
 }
 
@@ -132,37 +138,38 @@ void Pid::showLPID()
         return ;
     }
     uint16_t data16 = 0;
-    jointGetL_POSITION_P(joint, &data16, 100, NULL);
+    // 位置环P
+    jointGet(L_POSITION_P, 2, (Joint *)joint, (void *)&data16, 50, NULL);
     uiPid->POS_PSpinBox->setValue(data16);
     // 位置环I
-    jointGetL_POSITION_I(joint, &data16, 100, NULL);
+    jointGet(L_POSITION_I, 2, (Joint *)joint, (void *)&data16, 50, NULL);
     uiPid->POS_ISpinBox->setValue(data16);
     // 位置环D
-    jointGetL_POSITION_D(joint, &data16, 100, NULL);
+    jointGet(L_POSITION_D, 2, (Joint *)joint, (void *)&data16, 50, NULL);
     uiPid->POS_DSpinBox->setValue(data16);
     // 位置死区
-    jointGetL_POSITION_DS(joint, &data16, 100, NULL);
+    jointGet(L_POSITION_DS, 2, (Joint *)joint, (void *)&data16, 50, NULL);
     uiPid->POS_DSSpinBox->setValue(data16);
-    // 速度环P
-    jointGetL_SPEED_P(joint, &data16, 100, NULL);
+    // 速度环P;
+    jointGet(L_SPEED_P, 2, (Joint *)joint, (void *)&data16, 50, NULL);
     uiPid->SPD_PSpinBox->setValue(data16);
     // 速度环I
-    jointGetL_SPEED_I(joint, &data16, 100,NULL);
+    jointGet(L_SPEED_I, 2, (Joint *)joint, (void *)&data16, 50, NULL);
     uiPid->SPD_ISpinBox->setValue(data16);
     // 速度环D
-    jointGetL_SPEED_D(joint, &data16, 100, NULL);
+    jointGet(L_SPEED_D, 2, (Joint *)joint, (void *)&data16, 50, NULL);
     uiPid->SPD_DSpinBox->setValue(data16);
     // 速度死区
-    jointGetL_SPEED_DS(joint, &data16, 100, NULL);
+    jointGet(L_SPEED_DS, 2, (Joint *)joint, (void *)&data16, 50, NULL);
     uiPid->SPD_DSSpinBox->setValue(data16);
     // 电流环P
-    jointGetL_CURRENT_P(joint, &data16, 100, NULL);
+    jointGet(L_CURRENT_P, 2, (Joint *)joint, (void *)&data16, 50, NULL);
     uiPid->CUR_PSpinBox->setValue(data16);
     // 电流环I
-    jointGetL_CURRENT_I(joint, &data16, 100, NULL);
+    jointGet(L_CURRENT_I, 2, (Joint *)joint, (void *)&data16, 50, NULL);
     uiPid->CUR_ISpinBox->setValue(data16);
     // 电流环D
-    jointGetL_CURRENT_D(joint, &data16, 100, NULL);
+    jointGet(L_CURRENT_D, 2, (Joint *)joint, (void *)&data16, 50, NULL);
     uiPid->CUR_DSpinBox->setValue(data16);
 }
 
@@ -179,19 +186,19 @@ void Pid::showMaxLimit()
     jointGetMaxSpeed(joint, &data16, 100, NULL);
     uiPid->maxSpdLineEdit->setText(QString::number(data16/100, 10));
 
-    jointGetLIT_MAX_CURRENT(joint, &data16, 100, NULL);
+    jointGet(LIT_MAX_CURRENT, 2, (Joint *)joint, (void *)&data16, 50, NULL);
     uiPid->maxCurLineEdit->setText(QString::number(data16, 10));
 
-    jointGetLIT_MIN_POSITION_L(joint, &data16, 100, NULL);
+    jointGet(LIT_MIN_POSITION_L, 2, (Joint *)joint, (void *)&data16, 50, NULL);
     uiPid->minPosLLineEdit->setText(QString::number(data16, 10));
 
-    jointGetLIT_MIN_POSITION_H(joint, &data16, 100, NULL);
+    jointGet(LIT_MIN_POSITION_H, 2, (Joint *)joint, (void *)&data16, 50, NULL);
     uiPid->minPosHLineEdit->setText(QString::number(data16, 10));
 
-    jointGetLIT_MAX_POSITION_L(joint, &data16, 100, NULL);
+    jointGet(LIT_MAX_POSITION_L, 2, (Joint *)joint, (void *)&data16, 50, NULL);
     uiPid->maxPosLLineEdit->setText(QString::number(data16, 10));
 
-    jointGetLIT_MAX_POSITION_H(joint, &data16, 100, NULL);
+    jointGet(LIT_MAX_POSITION_H, 2, (Joint *)joint, (void *)&data16, 50, NULL);
     uiPid->maxPosHLineEdit->setText(QString::number(data16, 10));
 }
 
@@ -201,17 +208,17 @@ void Pid::on_POS_PSpinBox_editingFinished()
         uiPid->POS_PSpinBox->setValue(0);
         return ;
     }
-    QString str = uiPid->POS_PSpinBox->text();
+    uint16_t value = uiPid->POS_PSpinBox->text().toShort();
     int index = uiPid->adjustGroupComboBox->currentIndex();
     switch(index) {
     case 0:
-        jointSetPositionP(joint, str.toShort(), 100, NULL);
+        jointSet(S_POSITION_P, 2, (Joint *)joint, (void *)&value, 50, NULL);
         break;
     case 1:
-        jointSetM_POSITION_P(joint, str.toShort(), 100, NULL);
+        jointSet(M_POSITION_P, 2, (Joint *)joint, (void *)&value, 50, NULL);
         break;
     case 2:
-        jointSetL_POSITION_P(joint, str.toShort(), 100, NULL);
+        jointSet(L_POSITION_P, 2, (Joint *)joint, (void *)&value, 50, NULL);
         break;
     default :
         break;
@@ -224,17 +231,17 @@ void Pid::on_POS_ISpinBox_editingFinished()
         uiPid->POS_ISpinBox->setValue(0);
         return ;
     }
-    QString str = uiPid->POS_ISpinBox->text();
+    uint16_t value = uiPid->POS_ISpinBox->text().toShort();
     int index = uiPid->adjustGroupComboBox->currentIndex();
     switch(index) {
     case 0:
-        jointSetS_POSITION_I(joint, str.toShort(), 100, NULL);
+        jointSet(S_POSITION_I, 2, (Joint *)joint, (void *)&value, 50, NULL);
         break;
     case 1:
-        jointSetM_POSITION_I(joint,str.toShort(), 100, NULL);
+        jointSet(M_POSITION_I, 2, (Joint *)joint, (void *)&value, 50, NULL);
         break;
     case 2:
-        jointSetL_POSITION_I(joint, str.toShort(), 100, NULL);
+        jointSet(L_POSITION_I, 2, (Joint *)joint, (void *)&value, 50, NULL);
         break;
     default :
         break;
@@ -250,17 +257,17 @@ void Pid::on_POS_DSpinBox_editingFinished()
         uiPid->POS_DSpinBox->setValue(0);
         return ;
     }
-    QString str = uiPid->POS_DSpinBox->text();
+    uint16_t value = uiPid->POS_DSpinBox->text().toShort();
     int index = uiPid->adjustGroupComboBox->currentIndex();
     switch(index) {
     case 0:
-        jointSetS_POSITION_D(joint, str.toShort(), 100, NULL);
+        jointSet(S_POSITION_D, 2, (Joint *)joint, (void *)&value, 50, NULL);
         break;
     case 1:
-        jointSetM_POSITION_D(joint, str.toShort(), 100, NULL);
+        jointSet(M_POSITION_D, 2, (Joint *)joint, (void *)&value, 50, NULL);
         break;
     case 2:
-        jointSetL_POSITION_D(joint, str.toShort(), 100, NULL);
+        jointSet(L_POSITION_D, 2, (Joint *)joint, (void *)&value, 50, NULL);
         break;
     default :
         break;
@@ -276,17 +283,17 @@ void Pid::on_POS_DSSpinBox_editingFinished()
         uiPid->POS_DSSpinBox->setValue(0);
         return ;
     }
-    QString str = uiPid->POS_DSSpinBox->text();
+    uint16_t value = uiPid->POS_DSSpinBox->text().toShort();
     int index = uiPid->adjustGroupComboBox->currentIndex();
     switch(index) {
     case 0:
-        jointSetPositionDs(joint, str.toShort(), 100, NULL);
+        jointSet(S_POSITION_DS, 2, (Joint *)joint, (void *)&value, 50, NULL);
         break;
     case 1:
-        jointSetM_POSITION_DS(joint, str.toShort(), 100, NULL);
+        jointSet(M_POSITION_DS, 2, (Joint *)joint, (void *)&value, 50, NULL);
         break;
     case 2:
-        jointSetL_POSITION_DS(joint, str.toShort(), 100, NULL);
+        jointSet(L_POSITION_DS, 2, (Joint *)joint, (void *)&value, 50, NULL);
         break;
     default :
         break;
@@ -299,17 +306,17 @@ void Pid::on_SPD_PSpinBox_editingFinished()
         uiPid->SPD_PSpinBox->setValue(0);
         return ;
     }
-    QString str = uiPid->SPD_PSpinBox->text();
+    uint16_t value = uiPid->SPD_PSpinBox->text().toShort();
     int index = uiPid->adjustGroupComboBox->currentIndex();
     switch(index) {
     case 0:
-        jointSetSpeedP(joint, str.toShort(), 100, NULL);
+        jointSet(S_SPEED_P, 2, (Joint *)joint, (void *)&value, 50, NULL);
         break;
     case 1:
-        jointSetM_SPEED_P(joint, str.toShort(), 100, NULL);
+        jointSet(M_SPEED_P, 2, (Joint *)joint, (void *)&value, 50, NULL);
         break;
     case 2:
-        jointSetL_SPEED_P(joint, str.toShort(), 100, NULL);
+        jointSet(L_SPEED_P, 2, (Joint *)joint, (void *)&value, 50, NULL);
         break;
     default :
         break;
@@ -325,17 +332,17 @@ void Pid::on_SPD_ISpinBox_editingFinished()
         uiPid->SPD_ISpinBox->setValue(0);
         return ;
     }
-    QString str = uiPid->SPD_ISpinBox->text();
+    uint16_t value = uiPid->SPD_ISpinBox->text().toShort();
     int index = uiPid->adjustGroupComboBox->currentIndex();
     switch(index) {
     case 0:
-        jointSetSpeedI(joint, str.toShort(), 100, NULL);
+        jointSet(S_SPEED_I, 2, (Joint *)joint, (void *)&value, 50, NULL);
         break;
     case 1:
-        jointSetM_SPEED_I(joint, str.toShort(), 100, NULL);
+        jointSet(M_SPEED_I, 2, (Joint *)joint, (void *)&value, 50, NULL);
         break;
     case 2:
-        jointSetL_SPEED_I(joint, str.toShort(), 100, NULL);
+        jointSet(L_SPEED_I, 2, (Joint *)joint, (void *)&value, 50, NULL);
         break;
     default :
         break;
@@ -348,17 +355,17 @@ void Pid::on_SPD_DSpinBox_editingFinished()
         uiPid->SPD_DSpinBox->setValue(0);
         return ;
     }
-    QString str = uiPid->SPD_DSpinBox->text();
+    uint16_t value = uiPid->SPD_DSpinBox->text().toShort();
     int index = uiPid->adjustGroupComboBox->currentIndex();
     switch(index) {
     case 0:
-        jointSetS_SPEED_D(joint, str.toShort(), 100, NULL);
+        jointSet(S_SPEED_D, 2, (Joint *)joint, (void *)&value, 50, NULL);
         break;
     case 1:
-        jointSetM_SPEED_D(joint, str.toShort(), 100, NULL);
+        jointSet(M_SPEED_D, 2, (Joint *)joint, (void *)&value, 50, NULL);
         break;
     case 2:
-        jointSetL_SPEED_D(joint, str.toShort(), 100, NULL);
+        jointSet(L_SPEED_D, 2, (Joint *)joint, (void *)&value, 50, NULL);
         break;
     default :
         break;
@@ -371,17 +378,17 @@ void Pid::on_SPD_DSSpinBox_editingFinished()
         uiPid->SPD_DSSpinBox->setValue(0);
         return ;
     }
-    QString str = uiPid->SPD_DSSpinBox->text();
+    uint16_t value = uiPid->SPD_DSSpinBox->text().toShort();
     int index = uiPid->adjustGroupComboBox->currentIndex();
     switch(index) {
     case 0:
-        jointSetS_SPEED_DS(joint, str.toShort(), 100, NULL);
+        jointSet(S_SPEED_DS, 2, (Joint *)joint, (void *)&value, 50, NULL);
         break;
     case 1:
-        jointSetM_SPEED_DS(joint, str.toShort(), 100, NULL);
+        jointSet(M_SPEED_DS, 2, (Joint *)joint, (void *)&value, 50, NULL);
         break;
     case 2:
-        jointSetL_SPEED_DS(joint, str.toShort(), 100, NULL);
+        jointSet(L_SPEED_DS, 2, (Joint *)joint, (void *)&value, 50, NULL);
         break;
     default :
         break;
@@ -397,17 +404,17 @@ void Pid::on_CUR_PSpinBox_editingFinished()
         uiPid->CUR_PSpinBox->setValue(0);
         return ;
     }
-    QString str = uiPid->CUR_PSpinBox->text();
+    uint16_t value = uiPid->CUR_PSpinBox->text().toShort();
     int index = uiPid->adjustGroupComboBox->currentIndex();
     switch(index) {
     case 0:
-        jointSetCurrP(joint, str.toShort(), 100, NULL);
+        jointSet(S_CURRENT_P, 2, (Joint *)joint, (void *)&value, 50, NULL);
         break;
     case 1:
-        jointSetM_CURRENT_P(joint, str.toShort(), 100, NULL);
+        jointSet(M_CURRENT_P, 2, (Joint *)joint, (void *)&value, 50, NULL);
         break;
     case 2:
-        jointSetL_CURRENT_P(joint, str.toShort(), 100, NULL);
+        jointSet(L_CURRENT_P, 2, (Joint *)joint, (void *)&value, 50, NULL);
         break;
     default :
         break;
@@ -423,17 +430,17 @@ void Pid::on_CUR_ISpinBox_editingFinished()
         uiPid->CUR_ISpinBox->setValue(0);
         return ;
     }
-    QString str = uiPid->CUR_ISpinBox->text();
+    uint16_t value = uiPid->CUR_ISpinBox->text().toShort();
     int index = uiPid->adjustGroupComboBox->currentIndex();
     switch(index) {
     case 0:
-        jointSetCurrI(joint, str.toShort(), 100, NULL);
+        jointSet(S_CURRENT_I, 2, (Joint *)joint, (void *)&value, 50, NULL);
         break;
     case 1:
-        jointSetM_CURRENT_I(joint, str.toShort(), 100, NULL);
+        jointSet(M_CURRENT_I, 2, (Joint *)joint, (void *)&value, 50, NULL);
         break;
     case 2:
-        jointSetL_CURRENT_I(joint, str.toShort(), 100, NULL);
+        jointSet(L_CURRENT_I, 2, (Joint *)joint, (void *)&value, 50, NULL);
         break;
     default :
         break;
@@ -446,17 +453,17 @@ void Pid::on_CUR_DSpinBox_editingFinished()
         uiPid->CUR_DSpinBox->setValue(0);
         return ;
     }
-    QString str = uiPid->CUR_DSpinBox->text();
+    uint16_t value = uiPid->CUR_DSpinBox->text().toShort();
     int index = uiPid->adjustGroupComboBox->currentIndex();
     switch(index) {
     case 0:
-        jointSetS_CURRENT_D(joint, str.toShort(), 100, NULL);
+        jointSet(S_CURRENT_D, 2, (Joint *)joint, (void *)&value, 50, NULL);
         break;
     case 1:
-        jointSetM_CURRENT_D(joint, str.toShort(), 100, NULL);
+        jointSet(M_CURRENT_D, 2, (Joint *)joint, (void *)&value, 50, NULL);
         break;
     case 2:
-        jointSetL_CURRENT_D(joint, str.toShort(), 100, NULL);
+        jointSet(L_CURRENT_D, 2, (Joint *)joint, (void *)&value, 50, NULL);
         break;
     default :
         break;
@@ -483,16 +490,6 @@ void Pid::on_adjustGroupComboBox_currentIndexChanged(int index)
     }
 }
 
-void Pid::on_maxSpdLineEdit_editingFinished()
-{
-    if(!joint) {
-        uiPid->maxSpdLineEdit->setText("");
-        return ;
-    }
-    QString str = uiPid->maxSpdLineEdit->text();
-    jointSetMaxSpeed(joint, str.toShort(), 100, NULL);
-}
-
 void Pid::on_maxAccLineEdit_editingFinished()
 {
 #if LHDEBUG
@@ -506,6 +503,56 @@ void Pid::on_maxAccLineEdit_editingFinished()
     jointSetMaxAcceleration(joint, str.toShort(), 100, NULL);
 }
 
+void Pid::on_minPosLLineEdit_editingFinished()
+{
+    if(!joint) {
+        uiPid->minPosLLineEdit->setText("");
+        return ;
+    }
+    uint16_t value = uiPid->minPosLLineEdit->text().toShort();
+    jointSet(LIT_MIN_POSITION_L, 2, (Joint *)joint, (void *)&value, 50, NULL);
+}
+
+void Pid::on_minPosHLineEdit_editingFinished()
+{
+    if(!joint) {
+        uiPid->minPosHLineEdit->setText("");
+        return ;
+    }
+    uint16_t value = uiPid->minPosHLineEdit->text().toShort();
+    jointSet(LIT_MIN_POSITION_H, 2, (Joint *)joint, (void *)&value, 50, NULL);
+}
+
+void Pid::on_maxPosLLineEdit_editingFinished()
+{
+    if(!joint) {
+        uiPid->maxPosLLineEdit->setText("");
+        return ;
+    }
+    uint16_t value = uiPid->maxPosLLineEdit->text().toShort();
+    jointSet(LIT_MAX_POSITION_L, 2, (Joint *)joint, (void *)&value, 50, NULL);
+}
+
+void Pid::on_maxPosHLineEdit_editingFinished()
+{
+    if(!joint) {
+        uiPid->maxPosHLineEdit->setText("");
+        return ;
+    }
+    uint16_t value = uiPid->maxPosHLineEdit->text().toShort();
+    jointSet(LIT_MAX_POSITION_H, 2, (Joint *)joint, (void *)&value, 50, NULL);
+}
+
+void Pid::on_maxSpdLineEdit_editingFinished()
+{
+    if(!joint) {
+        uiPid->maxSpdLineEdit->setText("");
+        return ;
+    }
+    uint16_t value = uiPid->maxSpdLineEdit->text().toShort() * 100;
+    jointSet(LIT_MAX_SPEED, 2, (Joint *)joint, (void *)&value, 50, NULL);
+}
+
 /**
  * @brief Pid::on_maxCurLineEdit_editingFinished
  */
@@ -515,47 +562,7 @@ void Pid::on_maxCurLineEdit_editingFinished()
         uiPid->maxCurLineEdit->setText("");
         return ;
     }
-    QString str = uiPid->maxCurLineEdit->text();
+    uint16_t value = uiPid->maxCurLineEdit->text().toShort();
     // 设置最大的电流
-    jointSetLIT_MAX_CURRENT(joint, str.toShort(), 100, NULL);
-}
-
-void Pid::on_minPosLLineEdit_editingFinished()
-{
-    if(!joint) {
-        uiPid->minPosLLineEdit->setText("");
-        return ;
-    }
-    QString str = uiPid->minPosLLineEdit->text();
-    jointSetLIT_MIN_POSITION_L(joint, str.toShort(), 100, NULL);
-}
-
-void Pid::on_minPosHLineEdit_editingFinished()
-{
-    if(!joint) {
-        uiPid->minPosHLineEdit->setText("");
-        return ;
-    }
-    QString str = uiPid->minPosHLineEdit->text();
-    jointSetLIT_MIN_POSITION_H(joint, str.toShort(), 100, NULL);
-}
-
-void Pid::on_maxPosLLineEdit_editingFinished()
-{
-    if(!joint) {
-        uiPid->maxPosLLineEdit->setText("");
-        return ;
-    }
-    QString str = uiPid->maxPosLLineEdit->text();
-    jointSetLIT_MAX_POSITION_L(joint, str.toShort(), 100, NULL);
-}
-
-void Pid::on_maxPosHLineEdit_editingFinished()
-{
-    if(!joint) {
-        uiPid->maxPosHLineEdit->setText("");
-        return ;
-    }
-    QString str = uiPid->maxPosHLineEdit->text();
-    jointSetLIT_MAX_POSITION_H(joint, str.toShort(), 100, NULL);
+    jointSet(LIT_MAX_CURRENT, 2, (Joint *)joint, (void *)&value, 50, NULL);
 }

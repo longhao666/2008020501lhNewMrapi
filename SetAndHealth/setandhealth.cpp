@@ -2,6 +2,7 @@
 #include "ui_setandhealth.h"
 #include <QMessageBox>
 #include <QDebug>
+#include "joint.h"
 
 #define LHDEBUG 0
 
@@ -31,8 +32,9 @@ void SetAndHealth::SetAndHealthIint(int ID)
 {
 #if LHDEBUG
     qDebug() <<__DATE__<<__TIME__<<__FILE__<<__LINE__<<__func__;
+    qDebug() << "ID = " << ID;
 #endif
-    this->joint = jointGetJoint(ID);
+    this->joint = jointSelect(ID);
     if(!joint) {
         return ;
     }
@@ -71,8 +73,8 @@ void SetAndHealth::myTimerSlot()
     uint16_t data_L = 0;
     uint16_t data_H = 0;
     // 读取速度
-    jointGetSpeed(joint,&data32,5,NULL);
-    jointGetSYS_REDU_RATIO(joint, &data16, 5, NULL); // 减速比
+    jointGet(SYS_SPEED_L, 4, (Joint *)joint, (void *)&data32, 50, NULL);
+    jointGet(SYS_REDU_RATIO, 2, (Joint *)joint, (void *)&data16, 50, NULL); // 减速比
     data_L = (uint16_t)(data32 & 0xffff);
     data_H = (uint16_t)(data32>>16);
     float speed = (float) ((data_L + data_H * 65536) * 60.0 / 65536.0 / data16);
@@ -105,19 +107,25 @@ void SetAndHealth::myTimerSlot()
     jointGetVoltage(joint,&data16,5,NULL);
     uiSetAndHealth->voltageLineEdit->setText(QString::number((double)data16 / 100, 'f', 2) + "V");
     // 读取编码器电池电压
-    jointGetBAT_VOLT(joint, &data16, 5, NULL);
+//    jointGetBAT_VOLT(joint, &data16, 5, NULL);
+    jointGet(BAT_VOLT, 2, (Joint *)joint, (void *)&data16, 50, NULL);
     uiSetAndHealth->bATVoltLineEdit->setText(QString::number((double)data16 / 100, 'f', 2) + "V");
     // 更新三轴加速度,并显示
-    jointGetACC_X(joint, &data16, 5, NULL);
+//    jointGetACC_X(joint, &data16, 5, NULL);
+    jointGet(ACC_X, 2, (Joint *)joint, (void *)&data16, 50, NULL);
     uiSetAndHealth->accXLineEdit->setText(QString::number((short)data16) + "mg");
-    jointGetACC_Y(joint, &data16, 5, NULL);
+//    jointGetACC_Y(joint, &data16, 5, NULL);
+    jointGet(ACC_Y, 2, (Joint *)joint, (void *)&data16, 50, NULL);
     uiSetAndHealth->accYLineEdit->setText(QString::number((short)data16) + "mg");
-    jointGetACC_Z(joint, &data16, 5, NULL);
+//    jointGetACC_Z(joint, &data16, 5, NULL);
+    jointGet(ACC_Z, 2, (Joint *)joint, (void *)&data16, 50, NULL);
     uiSetAndHealth->accZLineEdit->setText(QString::number((short)data16) + "mg");
     // 更新编码器,并显示
-    jointGetMOT_MT_DAT(joint,&data16, 5, NULL);
+//    jointGetMOT_MT_DAT(joint,&data16, 5, NULL);
+    jointGet(MOT_MT_DAT, 2, (Joint *)joint, (void *)&data16, 50, NULL);
     uiSetAndHealth->m_TurnLineEdit->setText(QString::number((short)data16));
-    jointGetMOT_ST_DAT(joint, &data16, 5, NULL);
+//    jointGetMOT_ST_DAT(joint, &data16, 5, NULL);
+    jointGet(MOT_ST_DAT, 2, (Joint *)joint, (void *)&data16, 50, NULL);
     uiSetAndHealth->s_TurnLineEdit->setText(QString::number((double)data16 * 360.0/65536.0) + "°");
 }
 
@@ -148,7 +156,7 @@ void SetAndHealth::on_setZeroPushButton_clicked()
     uint16_t workMode = 0;
     jointGetMode(joint, &workMode, 100, NULL);
     if(workMode == 3) {
-#if  1
+#if  0
         qDebug() << tr("  尴尬了  ");
         uint32_t udata32 = 0;
         int32_t data32 = 0;
@@ -164,7 +172,7 @@ void SetAndHealth::on_setZeroPushButton_clicked()
         emit ZeroPositionSeted();
         jointSetZero(joint,100,NULL);
         emit ZeroPositionSeted();
-#if  1
+#if  0
         qDebug() << tr("  尴尬了  ");
 //        uint32_t udata32 = 0;
 //        int32_t data32 = 0;

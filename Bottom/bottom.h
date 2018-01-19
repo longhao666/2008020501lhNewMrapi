@@ -5,6 +5,7 @@
 #include "mrapi.h"
 #include <QWidget>
 
+
 class QTimer;
 
 namespace Ui {

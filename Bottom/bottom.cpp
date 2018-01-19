@@ -4,12 +4,13 @@
 #include <QDebug>
 #include <iostream>
 #include <QTimer>
+#include "joint.h"
 
 using std::vector;
 using std::sort;
 
 #define LHDEBUG 0
-#define BOTTOM_UPDATE_INTEVAL 3000
+#define BOTTOM_UPDATE_INTEVAL 50000000
 
 Bottom::Bottom(QWidget *parent) :
     QWidget(parent),
@@ -48,7 +49,7 @@ void Bottom::dealIDChanged(int newID)
 void Bottom::updateEnableDriver()
 {
     uint16_t data16 = 0;
-    jointGetSYS_ENABLE_DRIVER(joint, &data16, 50, NULL);
+    jointGet(SYS_ENABLE_DRIVER, 2, (Joint *)joint, (void *)&data16, 50, NULL);
     if(data16) {
         uiBottom->enableDriverPushButton_2->setStyleSheet("background-color:green");
         uiBottom->enableDriverPushButton->setText("Enabled");
@@ -93,7 +94,7 @@ void Bottom::updateIfError()
 {
     uint16_t data16 = 0;
 //    QString ifErrorPushButtonStr = "background-color:green";
-    jointGetSYS_ERROR(joint, &data16, 50, NULL);
+    jointGet(SYS_ERROR, 2, (Joint *)joint, (void *)&data16, 50, NULL);
     if(data16 != 0) {
         uiBottom->ifErrorPushButton->setStyleSheet("");
     }else {
@@ -130,7 +131,10 @@ void Bottom::on_btnUpdateID_clicked()
         return ;
     }
     sort(vectID.begin(), vectID.end());
-    joint = jointGetJoint((int)vectID.size() - 1);
+#if 0
+    qDebug() << "vectID.back()" << vectID.back();
+#endif
+    joint = jointSelect(vectID.back());
     for(vector<uint32_t>::iterator iter = vectID.begin();
         iter != vectID.end();
         ++iter) {
@@ -147,9 +151,11 @@ void Bottom::on_enableDriverPushButton_clicked()
         return ;
     }
     uint16_t data16 = 0;
-    jointGetSYS_ENABLE_DRIVER(joint, &data16, 50, NULL);
-    bool isEnable = !data16;
-    jointSetSYS_ENABLE_DRIVER(joint, isEnable, 50, NULL);
+    jointGet(SYS_ENABLE_DRIVER, 2, (Joint *)joint, (void *)&data16, 50, NULL);
+    bool isEbable = !data16;
+    uint16_t value = (int)isEbable;
+    qDebug() << data16 << isEbable;
+    jointSet(SYS_ENABLE_DRIVER, 2, (Joint *)joint, (void *)&value, 50, NULL);
     updateEnableDriver();
 }
 
@@ -183,7 +189,11 @@ void Bottom::on_cmbID_currentIndexChanged(int index)
     if(!joint) {
         return ;
     }
-    emit cmbIDChanged(index);
+    int jointID = uiBottom->cmbID->currentText().toInt();
+#if 1
+    qDebug() << "jointID  = " << jointID;
+#endif
+    emit cmbIDChanged(jointID);
     if(!timerBottom) {
         timerBottom = new QTimer(this);
         connect(timerBottom, SIGNAL(timeout()), this, SLOT(slotTimerBottomDone()));
@@ -223,9 +233,9 @@ void Bottom::on_cmbID_currentIndexChanged(int index)
         break;
     }
     uiBottom->typeLabel->setText(str);
-    jointGetSYS_REDU_RATIO(joint, &data16, 50, NULL);
+    jointGet(SYS_REDU_RATIO, 2, (Joint *)joint, (void *)&data16, 50, NULL);
     uiBottom->ratioLabel->setText(QString::number(data16, 10));
-    jointGetSYS_FW_VERSION(joint, &data16, 50, NULL);
+    jointGet(SYS_FW_VERSION, 2, (Joint *)joint, (void *)&data16, 50, NULL);
     uiBottom->firmLabel->setText(QString::number(data16, 10));
 }
 

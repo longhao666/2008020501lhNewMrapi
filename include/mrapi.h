@@ -21,7 +21,7 @@
 #define MODEL_TYPE_M17V2      0x021
 #define MODEL_TYPE_M20        0x030
 #define MODEL_TYPE_M20V2      0x031
-#define MODEL_TYPE_M20E       0x031
+#define MODEL_TYPE_M20V3      0x032
 #define MODEL_TYPE_LIFT       0x040
 
 //驱动器模式定义
@@ -34,13 +34,13 @@
 // Represent the MRAPI error and status codes
 //
 #define MR_ERROR_OK                0x00000U  // No error
-#define MR_ERROR_TIMEOUT           0x00000U  // No error
-#define MR_ERROR_BUSY              0x00004U  // Bus error: an error counter reached the 'light' limit
-#define MR_ERROR_ACK0              0x00008U  // Bus error: an error counter reached the 'heavy' limit
-#define MR_ERROR_ACK1              0x00008U  // Bus error: an error counter reached the 'heavy' limit
-#define MR_ERROR_QXMTFULL          0x00080U  // Transmit queue is full
-#define MR_ERROR_QXMTEMPTY         0x00080U  // Transmit queue is full
-#define MR_ERROR_ILLDATA           0x20000U  // Invalid data, function, or action
+#define MR_ERROR_TIMEOUT           0x00001U  // Read/Write timeout error
+#define MR_ERROR_BUSY              0x00002U  // Read/Write in progress
+#define MR_ERROR_ACK0              0x00004U  // Write acknowlogy 0
+#define MR_ERROR_ACK1              0x00008U  // Write acknowlogy 1
+#define MR_ERROR_QXMTFULL          0x00010U  // Transmit queue is full
+#define MR_ERROR_QXMTEMPTY         0x00020U  // Transmit queue is empty
+#define MR_ERROR_ILLDATA           0x00040U  // Invalid data, function, or action
 
 //错误字节MASK定义
 #define ERROR_MASK_OVER_CURRENT   0x0001    //过流
@@ -49,12 +49,20 @@
 #define ERROR_MASK_OVER_TEMP      0x0008    //过温
 #define ERROR_MASK_BATTERY        0x0010    //编码器电池错误
 #define ERROR_MASK_ENCODER        0x0020    //码盘错误
-//#define ERROR_MASK_POTEN          0x0040    //电位器错误
+#define ERROR_MASK_POTEN          0x0040    //电位器错误
 #define ERROR_MASK_CURRENT_INIT   0x0080    //电流检测错误
-//#define ERROR_MASK_FUSE           0x0100    //保险丝断开错误
+#define ERROR_MASK_FUSE           0x0100    //保险丝断开错误
+
+//示波器记录对象MASK定义
+#define SCP_MASK_TAGCUR				0x0001		//记录目标电流MASK
+#define SCP_MASK_MEACUR				0x0002		//记录实际电流MASK
+#define SCP_MASK_TAGSPD				0x0004		//记录目标速度MASK
+#define SCP_MASK_MEASPD				0x0008		//记录实际速度MASK
+#define SCP_MASK_TAGPOS				0x0010		//记录目标位置MASK
+#define SCP_MASK_MEAPOS				0x0020		//记录实际位置MASK
 
 #define isJointType(t) (t==MODEL_TYPE_M14)||(t==MODEL_TYPE_M17)||(t==MODEL_TYPE_M17V2)||(t==MODEL_TYPE_M20)||(t==MODEL_TYPE_M20V2) \
-						||(t==MODEL_TYPE_M20E)||(t==MODEL_TYPE_LIFT)
+						||(t==MODEL_TYPE_M20V3)||(t==MODEL_TYPE_LIFT)
 #define isJointMode(t) (t==MODE_OPEN)||(t==MODE_CURRENT)||(t==MODE_SPEED)||(t==MODE_POSITION)||(t==MODE_CYCLESYNC)
 
 typedef void* JOINT_HANDLE;
@@ -80,11 +88,13 @@ JOINT_HANDLE __stdcall jointSelect(uint16_t id);  //find joint by it's ID
 void __stdcall jointStartServo(JOINT_HANDLE pJoint, jQueShortHandler_t handler);
 void __stdcall jointStopServo(JOINT_HANDLE pJoint);
 
-int32_t __stdcall jointPush(JOINT_HANDLE pJoint, uint8_t* buf);
-int32_t __stdcall jointPoll(JOINT_HANDLE pJoint, uint8_t* buf);
+int32_t __stdcall jointPush(JOINT_HANDLE h, int32_t* pos, int32_t* speed, int32_t* current);
+int32_t __stdcall jointPoll(JOINT_HANDLE h, int32_t* pos, int32_t* speed, int32_t* current);
+int32_t __stdcall jointPollScope(JOINT_HANDLE h, int32_t* pos, int32_t* speed, int32_t* current);
 
 int32_t __stdcall jointGetId(JOINT_HANDLE pJoint, uint16_t* data, int32_t timeout, jCallback_t callBack);
 int32_t __stdcall jointGetType(JOINT_HANDLE pJoint, uint16_t* data, int32_t timeout, jCallback_t callBack);
+int32_t __stdcall jointGetError(JOINT_HANDLE pJoint, uint16_t* data, int32_t timeout, jCallback_t callBack);
 int32_t __stdcall jointGetVoltage(JOINT_HANDLE pJoint, uint16_t* data, int32_t timeout, jCallback_t callBack);
 int32_t __stdcall jointGetTemp(JOINT_HANDLE pJoint, uint16_t* data, int32_t timeout, jCallback_t callBack);
 int32_t __stdcall jointGetBaudrate(JOINT_HANDLE pJoint, uint16_t* data, int32_t timeout, jCallback_t callBack);
@@ -101,62 +111,6 @@ int32_t __stdcall jointGetSpeedP(JOINT_HANDLE pJoint, uint16_t* pValue, int32_t 
 int32_t __stdcall jointGetSpeedI(JOINT_HANDLE pJoint, uint16_t* iValue, int32_t timeout, jCallback_t callBack);
 int32_t __stdcall jointGetPositionP(JOINT_HANDLE pJoint, uint16_t* pValue, int32_t timeout, jCallback_t callBack);
 int32_t __stdcall jointGetPositionDs(JOINT_HANDLE pJoint, uint16_t* dsValue, int32_t timeout, jCallback_t callBack);
-// 我写的
-int32_t __stdcall jointGetSYS_ENABLE_DRIVER(JOINT_HANDLE pJoint, uint16_t* data, int32_t timeout, jCallback_t callBack);
-JOINT_HANDLE __stdcall jointGetJoint(int32_t ID);
-int32_t __stdcall jointGetTAG_OPEN_PWM(JOINT_HANDLE pJoint, int16_t* data, int32_t timeout, jCallback_t callBack);
-int32_t __stdcall jointGetTAG_CURRENT_L(JOINT_HANDLE pJoint, int32_t* data, int32_t timeout, jCallback_t callBack);
-int32_t __stdcall jointGetTAG_SPEED_L(JOINT_HANDLE pJoint, int32_t* data, int32_t timeout, jCallback_t callBack);
-int32_t __stdcall jointGetTAG_POSITION_L(JOINT_HANDLE pJoint, int32_t* data, int32_t timeout, jCallback_t callBack);
-int32_t __stdcall jointGetS_POSITION_I(JOINT_HANDLE pJoint, uint16_t* data, int32_t timeout, jCallback_t callBack);
-int32_t __stdcall jointGetS_POSITION_D(JOINT_HANDLE pJoint, uint16_t* data, int32_t timeout, jCallback_t callBack);
-int32_t __stdcall jointGetS_SPEED_D(JOINT_HANDLE pJoint, uint16_t* data, int32_t timeout, jCallback_t callBack);
-int32_t __stdcall jointGetS_SPEED_DS(JOINT_HANDLE pJoint, uint16_t* data, int32_t timeout, jCallback_t callBack);
-int32_t __stdcall jointGetS_CURRENT_D(JOINT_HANDLE pJoint, uint16_t* data, int32_t timeout, jCallback_t callBack);
-int32_t __stdcall jointGetSYS_REDU_RATIO(JOINT_HANDLE pJoint, uint16_t* data, int32_t timeout, jCallback_t callBack);
-int32_t __stdcall jointGetSCP_MASK(JOINT_HANDLE pJoint, uint16_t* data, int32_t timeout, jCallback_t callBack);
-int32_t __stdcall jointGetSCP_REC_TIM(JOINT_HANDLE pJoint, uint16_t* data, int32_t timeout, jCallback_t callBack);
-int32_t __stdcall jointGetSCP_MASK_Addr_Value(JOINT_HANDLE pJoint, uint16_t* data, uint8_t addr, int32_t timeout, jCallback_t callBack);
-int32_t __stdcall jointGetSYS_FW_VERSION(JOINT_HANDLE pJoint, uint16_t* data, int32_t timeout, jCallback_t callBack);
-int32_t __stdcall jointGetBAT_VOLT(JOINT_HANDLE pJoint, uint16_t* data, int32_t timeout, jCallback_t callBack);
-int32_t __stdcall jointGetACC_X(JOINT_HANDLE pJoint, uint16_t* data, int32_t timeout, jCallback_t callBack);
-int32_t __stdcall jointGetACC_Y(JOINT_HANDLE pJoint, uint16_t* data, int32_t timeout, jCallback_t callBack);
-int32_t __stdcall jointGetACC_Z(JOINT_HANDLE pJoint, uint16_t* data, int32_t timeout, jCallback_t callBack);
-int32_t __stdcall jointGetMOT_ST_DAT(JOINT_HANDLE pJoint, uint16_t* data, int32_t timeout, jCallback_t callBack);
-int32_t __stdcall jointGetMOT_MT_DAT(JOINT_HANDLE pJoint, uint16_t* data, int32_t timeout, jCallback_t callBack);
-int32_t __stdcall jointGetSYS_ERROR(JOINT_HANDLE pJoint, uint16_t* data, int32_t timeout, jCallback_t callBack);
-int32_t __stdcall jointGetLIT_MAX_CURRENT(JOINT_HANDLE pJoint, uint16_t* data, int32_t timeout, jCallback_t callBack);
-int32_t __stdcall jointGetLIT_MIN_POSITION_L(JOINT_HANDLE pJoint, uint16_t* data, int32_t timeout, jCallback_t callBack);
-int32_t __stdcall jointGetLIT_MIN_POSITION_H(JOINT_HANDLE pJoint, uint16_t* data, int32_t timeout, jCallback_t callBack);
-int32_t __stdcall jointGetLIT_MAX_POSITION_L(JOINT_HANDLE pJoint, uint16_t* data, int32_t timeout, jCallback_t callBack);
-int32_t __stdcall jointGetLIT_MAX_POSITION_H(JOINT_HANDLE pJoint, uint16_t* data, int32_t timeout, jCallback_t callBack);
-int32_t __stdcall jointGetM_CURRENT_P(JOINT_HANDLE pJoint, uint16_t* data, int32_t timeout, jCallback_t callBack);
-int32_t __stdcall jointGetM_CURRENT_I(JOINT_HANDLE pJoint, uint16_t* data, int32_t timeout, jCallback_t callBack);
-int32_t __stdcall jointGetM_CURRENT_D(JOINT_HANDLE pJoint, uint16_t* data, int32_t timeout, jCallback_t callBack);
-int32_t __stdcall jointGetM_SPEED_P(JOINT_HANDLE pJoint, uint16_t* data, int32_t timeout, jCallback_t callBack);
-int32_t __stdcall jointGetM_SPEED_I(JOINT_HANDLE pJoint, uint16_t* data, int32_t timeout, jCallback_t callBack);
-int32_t __stdcall jointGetM_SPEED_D(JOINT_HANDLE pJoint, uint16_t* data, int32_t timeout, jCallback_t callBack);
-int32_t __stdcall jointGetM_SPEED_DS(JOINT_HANDLE pJoint, uint16_t* data, int32_t timeout, jCallback_t callBack);
-int32_t __stdcall jointGetM_POSITION_P(JOINT_HANDLE pJoint, uint16_t* data, int32_t timeout, jCallback_t callBack);
-int32_t __stdcall jointGetM_POSITION_I(JOINT_HANDLE pJoint, uint16_t* data, int32_t timeout, jCallback_t callBack);
-int32_t __stdcall jointGetM_POSITION_D(JOINT_HANDLE pJoint, uint16_t* data, int32_t timeout, jCallback_t callBack);
-int32_t __stdcall jointGetM_POSITION_DS(JOINT_HANDLE pJoint, uint16_t* data, int32_t timeout, jCallback_t callBack);
-int32_t __stdcall jointGetL_CURRENT_P(JOINT_HANDLE pJoint, uint16_t* data, int32_t timeout, jCallback_t callBack);
-int32_t __stdcall jointGetL_CURRENT_I(JOINT_HANDLE pJoint, uint16_t* data, int32_t timeout, jCallback_t callBack);
-int32_t __stdcall jointGetL_CURRENT_D(JOINT_HANDLE pJoint, uint16_t* data, int32_t timeout, jCallback_t callBack);
-int32_t __stdcall jointGetL_SPEED_P(JOINT_HANDLE pJoint, uint16_t* data, int32_t timeout, jCallback_t callBack);
-int32_t __stdcall jointGetL_SPEED_I(JOINT_HANDLE pJoint, uint16_t* data, int32_t timeout, jCallback_t callBack);
-int32_t __stdcall jointGetL_SPEED_D(JOINT_HANDLE pJoint, uint16_t* data, int32_t timeout, jCallback_t callBack);
-int32_t __stdcall jointGetL_SPEED_DS(JOINT_HANDLE pJoint, uint16_t* data, int32_t timeout, jCallback_t callBack);
-int32_t __stdcall jointGetL_POSITION_P(JOINT_HANDLE pJoint, uint16_t* data, int32_t timeout, jCallback_t callBack);
-int32_t __stdcall jointGetL_POSITION_I(JOINT_HANDLE pJoint, uint16_t* data, int32_t timeout, jCallback_t callBack);
-int32_t __stdcall jointGetL_POSITION_D(JOINT_HANDLE pJoint, uint16_t* data, int32_t timeout, jCallback_t callBack);
-int32_t __stdcall jointGetL_POSITION_DS(JOINT_HANDLE pJoint, uint16_t* data, int32_t timeout, jCallback_t callBack);
-uint16_t __stdcall jointGetmastValue(JOINT_HANDLE pJoint, uint16_t* data, uint8_t addr, int32_t timeout, jCallback_t callBack);
-
-
-
-// =================================================================================================
 
 int32_t __stdcall jointSetID(JOINT_HANDLE pJoint, uint16_t id, int32_t timeout, jCallback_t callBack);
 int32_t __stdcall jointSetBaudrate(JOINT_HANDLE pJoint, uint16_t baud, int32_t timeout, jCallback_t callBack);
@@ -178,46 +132,6 @@ int32_t __stdcall jointSetSpeedI(JOINT_HANDLE pJoint, uint16_t iValue, int32_t t
 int32_t __stdcall jointSetPositionP(JOINT_HANDLE pJoint, uint16_t pValue, int32_t timeout, jCallback_t callBack);
 int32_t __stdcall jointSetPositionDs(JOINT_HANDLE pJoint, uint16_t dsValue, int32_t timeout, jCallback_t callBack);
 int32_t __stdcall jointSetScpMask(JOINT_HANDLE pJoint, uint16_t mask, int32_t timeout, jCallback_t callBack);
-// 我写的
-int32_t __stdcall jointSetSYS_ENABLE_DRIVER(JOINT_HANDLE pJoint, uint16_t data, int32_t timeout, jCallback_t callBack);
-int32_t __stdcall jointSetTAG_OPEN_PWM(JOINT_HANDLE pJoint, int16_t data, int32_t timeout, jCallback_t callBack);
-int32_t __stdcall jointSetTAG_CURRENT_L(JOINT_HANDLE pJoint, int32_t data, int32_t timeout, jCallback_t callBack);
-int32_t __stdcall jointSetTAG_SPEED_L(JOINT_HANDLE pJoint, int32_t data, int32_t timeout, jCallback_t callBack);
-int32_t __stdcall jointSetTAG_POSITION_L(JOINT_HANDLE pJoint, int32_t data, int32_t timeout, jCallback_t callBack);
-int32_t __stdcall jointSetS_POSITION_I(JOINT_HANDLE pJoint, uint16_t data, int32_t timeout, jCallback_t callBack);
-int32_t __stdcall jointSetS_POSITION_D(JOINT_HANDLE pJoint, uint16_t data, int32_t timeout, jCallback_t callBack);
-int32_t __stdcall jointSetS_SPEED_D(JOINT_HANDLE pJoint, uint16_t data, int32_t timeout, jCallback_t callBack);
-int32_t __stdcall jointSetS_SPEED_DS(JOINT_HANDLE pJoint, uint16_t data, int32_t timeout, jCallback_t callBack);
-int32_t __stdcall jointSetS_CURRENT_D(JOINT_HANDLE pJoint, uint16_t data, int32_t timeout, jCallback_t callBack);
-int32_t __stdcall jointSetLIT_MAX_CURRENT(JOINT_HANDLE pJoint, uint16_t data, int32_t timeout, jCallback_t callBack);
-int32_t __stdcall jointSetLIT_MIN_POSITION_L(JOINT_HANDLE pJoint, uint16_t data, int32_t timeout, jCallback_t callBack);
-int32_t __stdcall jointSetLIT_MIN_POSITION_H(JOINT_HANDLE pJoint, uint16_t data, int32_t timeout, jCallback_t callBack);
-int32_t __stdcall jointSetLIT_MAX_POSITION_L(JOINT_HANDLE pJoint, uint16_t data, int32_t timeout, jCallback_t callBack);
-int32_t __stdcall jointSetLIT_MAX_POSITION_H(JOINT_HANDLE pJoint, uint16_t data, int32_t timeout, jCallback_t callBack);
-int32_t __stdcall jointSetM_CURRENT_P(JOINT_HANDLE pJoint, uint16_t data, int32_t timeout, jCallback_t callBack);
-int32_t __stdcall jointSetM_CURRENT_I(JOINT_HANDLE pJoint, uint16_t data, int32_t timeout, jCallback_t callBack);
-int32_t __stdcall jointSetM_CURRENT_D(JOINT_HANDLE pJoint, uint16_t data, int32_t timeout, jCallback_t callBack);
-int32_t __stdcall jointSetM_SPEED_P(JOINT_HANDLE pJoint, uint16_t data, int32_t timeout, jCallback_t callBack);
-int32_t __stdcall jointSetM_SPEED_I(JOINT_HANDLE pJoint, uint16_t data, int32_t timeout, jCallback_t callBack);
-int32_t __stdcall jointSetM_SPEED_D(JOINT_HANDLE pJoint, uint16_t data, int32_t timeout, jCallback_t callBack);
-int32_t __stdcall jointSetM_SPEED_DS(JOINT_HANDLE pJoint, uint16_t data, int32_t timeout, jCallback_t callBack);
-int32_t __stdcall jointSetM_POSITION_P(JOINT_HANDLE pJoint, uint16_t data, int32_t timeout, jCallback_t callBack);
-int32_t __stdcall jointSetM_POSITION_I(JOINT_HANDLE pJoint, uint16_t data, int32_t timeout, jCallback_t callBack);
-int32_t __stdcall jointSetM_POSITION_D(JOINT_HANDLE pJoint, uint16_t data, int32_t timeout, jCallback_t callBack);
-int32_t __stdcall jointSetM_POSITION_DS(JOINT_HANDLE pJoint, uint16_t data, int32_t timeout, jCallback_t callBack);
-int32_t __stdcall jointSetL_CURRENT_P(JOINT_HANDLE pJoint, uint16_t data, int32_t timeout, jCallback_t callBack);
-int32_t __stdcall jointSetL_CURRENT_I(JOINT_HANDLE pJoint, uint16_t data, int32_t timeout, jCallback_t callBack);
-int32_t __stdcall jointSetL_CURRENT_D(JOINT_HANDLE pJoint, uint16_t data, int32_t timeout, jCallback_t callBack);
-int32_t __stdcall jointSetL_SPEED_P(JOINT_HANDLE pJoint, uint16_t data, int32_t timeout, jCallback_t callBack);
-int32_t __stdcall jointSetL_SPEED_I(JOINT_HANDLE pJoint, uint16_t data, int32_t timeout, jCallback_t callBack);
-int32_t __stdcall jointSetL_SPEED_D(JOINT_HANDLE pJoint, uint16_t data, int32_t timeout, jCallback_t callBack);
-int32_t __stdcall jointSetL_SPEED_DS(JOINT_HANDLE pJoint, uint16_t data, int32_t timeout, jCallback_t callBack);
-int32_t __stdcall jointSetL_POSITION_P(JOINT_HANDLE pJoint, uint16_t data, int32_t timeout, jCallback_t callBack);
-int32_t __stdcall jointSetL_POSITION_I(JOINT_HANDLE pJoint, uint16_t data, int32_t timeout, jCallback_t callBack);
-int32_t __stdcall jointSetL_POSITION_D(JOINT_HANDLE pJoint, uint16_t data, int32_t timeout, jCallback_t callBack);
-int32_t __stdcall jointSetL_POSITION_DS(JOINT_HANDLE pJoint, uint16_t data, int32_t timeout, jCallback_t callBack);
-
-
 
 #ifdef __cplusplus
 }

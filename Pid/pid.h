@@ -42,13 +42,14 @@ private slots:
     void on_CUR_ISpinBox_editingFinished();
     void on_CUR_DSpinBox_editingFinished();
     void on_adjustGroupComboBox_currentIndexChanged(int index);
-    void on_maxSpdLineEdit_editingFinished();
     void on_maxAccLineEdit_editingFinished();
-    void on_maxCurLineEdit_editingFinished();
     void on_minPosLLineEdit_editingFinished();
     void on_minPosHLineEdit_editingFinished();
     void on_maxPosLLineEdit_editingFinished();
     void on_maxPosHLineEdit_editingFinished();
+    void on_maxSpdLineEdit_editingFinished();
+    void on_maxCurLineEdit_editingFinished();
+
 
 private:
     Ui::Pid *uiPid;

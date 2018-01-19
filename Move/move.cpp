@@ -2,6 +2,7 @@
 #include "ui_move.h"
 #include <QDebug>
 #include <QTimer>
+#include "joint.h"
 
 #define LHDEBUG 0
 
@@ -51,7 +52,10 @@ void Move::moveInit(int ID)
         connect(timerMove, SIGNAL(timeout()), this, SLOT(slotTimeMoveDone()));
         //        timerMove->start(MOTION_CONTROL_INTEVAL); // 暂时不启动
     }
-    joint = jointGetJoint(ID);
+#if 1
+    qDebug() << "ID = " << ID;
+#endif
+    joint = jointSelect(ID);
     if(!joint) {
         qDebug("===================empty=======================");
         return ;
@@ -109,46 +113,34 @@ void Move::workModeUpdatetxtBias()
     if(!joint) {
         return ;
     }
-    int16_t data16 = 0;
     int32_t data32 = 0;
     int workMode = uiMove->cmbWorkMode->currentIndex();
     switch(workMode) { // 工作模式修改后，修改txtBias
     case MODE_OPEN:
-        jointGetTAG_OPEN_PWM(joint, &data16, 50, NULL);
-        uiMove->txtBias->setValue(data16); // 由当前目标PWM更新手动控制中的偏移量
+        uiMove->txtBias->setValue(0); // 由当前目标PWM更新手动控制中的偏移量
         uiMove->manualMax->setText("30");
         uiMove->manualMin->setText("-30");
         break;
     case MODE_CURRENT:
-//        jointGetTAG_CURRENT_L(joint, &data32, 50, NULL);
-        jointGetCurrent(joint, (uint32_t *)&data32, 50, NULL);
-        //uiMove->txtBias->setValue(data32); // 由当前实际电流更新手动控制中的偏移量，实际中处于0位的机械臂2关节突然掉下
         uiMove->txtBias->setValue(0); // 和上面注释的那句效果一样，不如就改成0
         uiMove->manualMax->setText("500");
         uiMove->manualMin->setText("-500");
         break;
     case MODE_SPEED: {
-        uint16_t udata16 = 0;
-        jointGetSYS_REDU_RATIO(joint, &udata16, 50, NULL);
-        //            qDebug() << udata16 << "dsfadsfa";
-//        jointGetTAG_SPEED_L(joint, &data32, 50, NULL);
-        jointGetSpeed(joint, (uint32_t *)&data32, 50, NULL);
-        data32 = (data32 * 60.0/65536) / udata16;
-        uiMove->txtBias->setValue(data32); // 由当前实际电流更新手动控制中的偏移量
+        uiMove->txtBias->setValue(0); // 由当前实际电流更新手动控制中的偏移量
         uiMove->manualMax->setText("20");
         uiMove->manualMin->setText("-20");
         break;
     }
-    case MODE_POSITION:
-//        jointGetTAG_POSITION_L(joint, &data32, 50, NULL);
-        // 应该是实际位置,而不是目标位置
-//        jointGetPosition(joint, (uint32_t *)&data32, 50, NULL);
-        jointGetPosition(joint, (uint32_t *)&data32, 50, NULL);
-        data32 = data32 * 360/65536;
-        uiMove->txtBias->setValue(data32); // 由当前实际位置更新手动控制中的偏移量
+    case MODE_POSITION: {
+        jointGet(SYS_POSITION_L, 4, (Joint *)joint, (void *)&data32, 50, NULL);
+        float tempf = (float)(data32);
+        tempf = tempf * 360.0/65536.0;
+        uiMove->txtBias->setValue(tempf); // 由当前实际位置更新手动控制中的偏移量
         uiMove->manualMax->setText("90");
         uiMove->manualMin->setText("-90");
         break;
+    }
     default:
         break;
     }
@@ -161,26 +153,32 @@ void Move::setMoveValue(int value)
     switch(workMode) // 不同控制模式，控制指令不同
     {
     case MODE_OPEN: {
-        int16_t pwm = (int16_t)value;
-        jointSetTAG_OPEN_PWM(joint, pwm, 50, NULL);
+        jointSet(TAG_OPEN_PWM, 2, (Joint *)joint, (void *)&value, 50, NULL);
         break;
     }
     case MODE_CURRENT: {
-        jointSetTAG_CURRENT_L(joint, value, 50, NULL);
+        jointSet(TAG_CURRENT_L, 4, (Joint *)joint, (void *)&value, 50, NULL);
         break;
     }
     case MODE_SPEED: {
+        static int count = 0;
+        count++;
         uint16_t udata16 = 0;
-        jointGetSYS_REDU_RATIO(joint, &udata16, 50, NULL);
-        //            qDebug() << udata16 << "dsfadsfa";
+#if 0
+        qDebug() << "count = " << count << "udata16 = " << udata16 << "value = " << value;
+#endif
+        jointGet(SYS_REDU_RATIO, 2, (Joint *)joint, (void *)&udata16, 50, NULL);
         value *= udata16;
-        value = value * 65536/60;
-        jointSetTAG_SPEED_L(joint, value, 50, NULL);
+        value = value * 65536.0/60.0;
+#if 0
+        qDebug() << "count = " << count << "udata16 = " << udata16 << "value = " << value;
+#endif
+        jointSet(TAG_SPEED_L, 4, (Joint *)joint, (void *)&value, 50, NULL);
         break;
     }
     case MODE_POSITION: {
         value = value * 65536/360;
-        jointSetTAG_POSITION_L(joint, value, 50, NULL);
+        jointSet(TAG_POSITION_L, 4, (Joint *)joint, (void *)&value, 50, NULL);
         break;
     }
     default: break;
@@ -441,22 +439,30 @@ void Move::on_stopButton_clicked()
     switch(workMode) // Different WorkMode Different Stop way
     {
     case MODE_OPEN: {
-        jointSetTAG_OPEN_PWM(joint, 0, 50, NULL);
+//        jointSetTAG_OPEN_PWM(joint, 0, 50, NULL);
+        int value = 0;
+        jointSet(TAG_OPEN_PWM, 2, (Joint *)joint, (void *)&value, 50, NULL);
         break;
     }
     case MODE_CURRENT: {
-        jointSetTAG_CURRENT_L(joint, 0, 50, NULL);
+//        jointSetTAG_CURRENT_L(joint, 0, 50, NULL);
+        int value = 0;
+        jointSet(TAG_CURRENT_L, 4, (Joint *)joint, (void *)&value, 50, NULL);
         break;
     }
     case MODE_SPEED: {
         // 猜测:按暂停后速度会马上变为0,应该是这里设置为0后,模块里面反应后减速一直到模块停下
-        jointSetTAG_SPEED_L(joint, 0, 50, NULL);
+//        jointSetTAG_SPEED_L(joint, 0, 50, NULL);
+        int value = 0;
+        jointSet(TAG_SPEED_L, 4, (Joint *)joint, (void *)&value, 50, NULL);
         break;
     }
     case MODE_POSITION: {
-        int data = 0;
-        jointGetTAG_POSITION_L(joint, &data, 50, NULL);
-        jointSetTAG_POSITION_L(joint, data, 50, NULL);
+        int value = 0;
+//        jointGetTAG_POSITION_L(joint, &data, 50, NULL);
+//        jointSetTAG_POSITION_L(joint, data, 50, NULL);
+        jointGet(SYS_POSITION_L, 4, (Joint *)joint, (void *)&value, 50, NULL);
+        jointSet(SYS_POSITION_L, 4, (Joint *)joint, (void *)&value, 50, NULL);
         break;
     }
     default:

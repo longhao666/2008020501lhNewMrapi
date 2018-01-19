@@ -1,5 +1,6 @@
 #include "oscilloscope.h"
 #include "ui_oscilloscope.h"
+#include "joint.h"
 
 #define LHDEBUG 0
 
@@ -24,7 +25,11 @@ OscilloScope::~OscilloScope()
 
 void OscilloScope::OscilloScopeInitialize(int ID)
 {
-    joint = jointGetJoint(ID); // 修改当前控制的模块ID
+//    joint = jointGetJoint(ID); // 修改当前控制的模块ID
+#if 1
+    qDebug() << "ID = " << ID;
+#endif
+    joint = jointSelect(ID);
   // initialize Oscilloscope - related content
   tgPOSPushButtonOn = "background-color: rgb(";
   tgPOSPushButtonOn += QString::number(TGPOS_RGB_R) + ',' + QString::number(TGPOS_RGB_G) + ',' + QString::number(TGPOS_RGB_B) + ");";
@@ -137,11 +142,13 @@ void OscilloScope::OscilloScopeInitialize(int ID)
 
     uint16_t data_L = 0;
     // 记录对象标志MASK的初始化
-    jointGetSCP_MASK(joint, &data_L, 100, NULL);
+//    jointGetSCP_MASK(joint, &data_L, 100, NULL);
+    jointGet(SCP_MASK, 2, (Joint *)joint, (void *)data_L, 50, NULL);
     osthread->paintArea->Mask = data_L;
     qDebug() << data_L << "dfdfd+++++++++++++++++++f";
     //参数表中的“记录时间间隔（对10kHZ的分频值）”显示到测量条件选项卡中的对应控件里
-    jointGetSCP_REC_TIM(joint, &data_L, 100, NULL);
+//    jointGetSCP_REC_TIM(joint, &data_L, 100, NULL);
+    jointGet(SCP_REC_TIM, 2, (Joint *)joint, (void *)data_L, 50, NULL);
     qDebug() << data_L << "dfdfdf";
     osthread->paintArea->ScanFrequency = data_L;
   uiOscilloScope->ScanFrequencyComboBox->setVisible(false); // 扫描频率设置改为不可见

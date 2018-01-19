@@ -5,7 +5,7 @@
 #include "pid.h"
 #include "bottom.h"
 #include "move.h"
-#include "oscilloscope.h"
+//#include "oscilloscope.h"
 
 #define LHDEBUG 0
 
@@ -53,15 +53,15 @@ void Widget::widgetInit()
     pid = new Pid;
     ui->pidLayout->addWidget(pid);
 
-    oscilloScope = new OscilloScope;
-    ui->oscilloScopeVerticalLayout->addWidget(oscilloScope);
+//    oscilloScope = new OscilloScope;
+//    ui->oscilloScopeVerticalLayout->addWidget(oscilloScope);
 
     connect(bottom, &Bottom::cmbIDChanged, pid, &Pid::pidInit);
-    connect(bottom, &Bottom::cmbIDChanged, move, &Move::moveInit);
-    connect(bottom, &Bottom::cmbIDChanged, setAndHealth, &SetAndHealth::SetAndHealthIint);
-    connect(bottom, &Bottom::cmbIDChanged, oscilloScope, &OscilloScope::OscilloScopeInitialize);
+//    connect(bottom, &Bottom::cmbIDChanged, move, &Move::moveInit);
+//    connect(bottom, &Bottom::cmbIDChanged, setAndHealth, &SetAndHealth::SetAndHealthIint);
+//    connect(bottom, &Bottom::cmbIDChanged, oscilloScope, &OscilloScope::OscilloScopeInitialize);
     connect(this, &Widget::widgetAllReady, bottom, &Bottom::waitingForWidgetReady);
-    connect(setAndHealth, &SetAndHealth::ZeroPositionSeted, move, &Move::ClickStopButton);
+//    connect(setAndHealth, &SetAndHealth::ZeroPositionSeted, move, &Move::ClickStopButton);
 
     emit widgetAllReady();
 }
