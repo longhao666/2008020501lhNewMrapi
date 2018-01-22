@@ -75,8 +75,8 @@
 #define ELOG( ...) 
 #endif
 
-FILE *logp;
-char sstime[256];
+extern FILE *logp;
+extern char sstime[256];
 
 void loggerInit(FILE **fp);
 void loggerTime(char*);

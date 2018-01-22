@@ -27,6 +27,7 @@
 #include "./Component/paintarea.h"
 #include "./Component/showqueue.h"
 #include "mrapi.h"
+#include "joint.h"
 
 #define GET_VALUE_INTEVAL   10  // 示波器采样周期（ms）
 #define UPDATE_SHOW_INTEVAL 10  // 示波器刷新显示周期（ms）

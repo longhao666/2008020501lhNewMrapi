@@ -1,6 +1,6 @@
 #include "oscilloscope.h"
 #include "ui_oscilloscope.h"
-#include "joint.h"
+//#include "joint.h"
 
 #define LHDEBUG 0
 

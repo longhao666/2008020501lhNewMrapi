@@ -191,7 +191,7 @@ void Bottom::on_cmbID_currentIndexChanged(int index)
     }
     int jointID = uiBottom->cmbID->currentText().toInt();
 #if 1
-    qDebug() << "jointID  = " << jointID;
+    qDebug() << "jointID  = " << jointID << "index = " << index;
 #endif
     emit cmbIDChanged(jointID);
     if(!timerBottom) {

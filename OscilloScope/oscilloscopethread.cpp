@@ -3,7 +3,7 @@
 #include <vector>
 #include "oscilloscopethread.h"
 #include "oscilloscope.h"
-#include "joint.h"
+//#include "joint.h"
 
 using std::vector;
 
@@ -186,9 +186,9 @@ void OscilloScopeThread::getData()
                     uint16_t data_L = 0;
                     uint16_t data_H = 0;
 //                    jointGetSCP_MASK_Addr_Value(JT->joint, &data_L, paintArea->showItems[i].Item, 100, NULL);
-                    jointSet(paintArea->showItems[i].Item, 2, (Joint *)JT->joint, (void *)data_L, 50, NULL);
+                    jointGet(paintArea->showItems[i].Item, 2, (Joint *)JT->joint, (void *)data_L, 50, NULL);
 //                    jointGetSCP_MASK_Addr_Value(JT->joint, &data_H, paintArea->showItems[i].Item + 1, 100, NULL);
-                    jointSet(paintArea->showItems[i].Item, 2, (Joint *)JT->joint, (void *)data_L, 50, NULL);
+                    jointGet(paintArea->showItems[i].Item, 2, (Joint *)JT->joint, (void *)data_H, 50, NULL);
 //                    if(data_L == 0 || data_H == 0) {
 //                        continue;
 //                    }
