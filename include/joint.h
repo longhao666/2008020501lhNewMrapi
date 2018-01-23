@@ -5,6 +5,12 @@
 
 #define CMDMAP_LEN            160    //
 
+#define MAX_CAN_DEVICES 4
+#define MAX_JOINTS 14
+#define MAX_SERVO_BUFS 128
+#define WARNING_SERVO_BUFS 20
+
+
 /// proctocol definition
 //系统状态相关
 #define SYS_ID                0x01    //驱动器ID
@@ -139,7 +145,7 @@ typedef struct td_joint
 	uint16_t* jointType;
 	uint8_t isOnline;
 
-	rec_t txQue[MAX_BUFS];
+	rec_t txQue[MAX_SERVO_BUFS];
 	uint16_t txQueFront;
 	uint16_t txQueRear;
 	jQueShortHandler_t jointBufUnderflowHandler;
@@ -154,9 +160,6 @@ extern "C" {
 #endif
 int32_t __stdcall jointGet(uint8_t index, uint8_t datLen, Joint* pJoint, void* data, int32_t timeout, jCallback_t callBack);
 int32_t __stdcall jointSet(uint8_t index, uint8_t datLen, Joint* pJoint, void* data, int32_t timeout, jCallback_t callBack);
-int32_t __stdcall jointGetValueToAddr(uint8_t index, uint8_t datLen, Joint* pJoint, int32_t* data, int32_t timeout, jCallback_t callBack);
-int32_t __stdcall jointSetValueToAddr(uint8_t index, uint8_t datLen, Joint* pJoint, int32_t data, int32_t timeout, jCallback_t callBack);
-
 #ifdef __cplusplus
 }
 #endif

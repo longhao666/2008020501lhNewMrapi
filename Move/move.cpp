@@ -52,7 +52,7 @@ void Move::moveInit(int ID)
         connect(timerMove, SIGNAL(timeout()), this, SLOT(slotTimeMoveDone()));
         //        timerMove->start(MOTION_CONTROL_INTEVAL); // 暂时不启动
     }
-#if 1
+#if 0
     qDebug() << "ID = " << ID;
 #endif
     joint = jointSelect(ID);
@@ -73,6 +73,9 @@ void Move::moveInit(int ID)
 
 void Move::ClickStopButton()
 {
+#if 0
+    qDebug() <<__DATE__<<__TIME__<<__FILE__<<__LINE__<<__func__;
+#endif
     if(!enableRun) {
         enableRun = true;
         on_stopButton_clicked();
@@ -462,7 +465,7 @@ void Move::on_stopButton_clicked()
 //        jointGetTAG_POSITION_L(joint, &data, 50, NULL);
 //        jointSetTAG_POSITION_L(joint, data, 50, NULL);
         jointGet(SYS_POSITION_L, 4, (Joint *)joint, (void *)&value, 50, NULL);
-        jointSet(SYS_POSITION_L, 4, (Joint *)joint, (void *)&value, 50, NULL);
+        jointSet(TAG_POSITION_L, 4, (Joint *)joint, (void *)&value, 50, NULL);
         break;
     }
     default:

@@ -184,7 +184,7 @@ void Pid::showMaxLimit()
     uiPid->maxAccLineEdit->setText(QString::number(data16, 10));
     // 最大速度
     jointGetMaxSpeed(joint, &data16, 100, NULL);
-    uiPid->maxSpdLineEdit->setText(QString::number(data16/100, 10));
+    uiPid->maxSpdLineEdit->setText(QString::number(data16, 10));
 
     jointGet(LIT_MAX_CURRENT, 2, (Joint *)joint, (void *)&data16, 50, NULL);
     uiPid->maxCurLineEdit->setText(QString::number(data16, 10));
@@ -549,7 +549,7 @@ void Pid::on_maxSpdLineEdit_editingFinished()
         uiPid->maxSpdLineEdit->setText("");
         return ;
     }
-    uint16_t value = uiPid->maxSpdLineEdit->text().toShort() * 100;
+    uint16_t value = uiPid->maxSpdLineEdit->text().toShort();
     jointSet(LIT_MAX_SPEED, 2, (Joint *)joint, (void *)&value, 50, NULL);
 }
 

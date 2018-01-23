@@ -6,7 +6,7 @@
 
 #define LHDEBUG 0
 
-#define MONITOR_INTEVAL 500         // 监视器更新周期（ms）
+#define MONITOR_INTEVAL 2000         // 监视器更新周期（ms）
 
 SetAndHealth::SetAndHealth(QWidget *parent) :
     QWidget(parent),
@@ -56,8 +56,9 @@ void SetAndHealth::health()
         timer = new QTimer;
 //        connect(timer,QTimer::timeout(),this,SetAndHealth::myTimerSlot());
         connect(timer,SIGNAL(timeout()),this,SLOT(myTimerSlot()));
-        timer->start(MONITOR_INTEVAL);
+//        timer->start(MONITOR_INTEVAL);
     }
+    this->myTimerSlot();
 }
 
 void SetAndHealth::myTimerSlot()
@@ -107,26 +108,54 @@ void SetAndHealth::myTimerSlot()
     jointGetVoltage(joint,&data16,5,NULL);
     uiSetAndHealth->voltageLineEdit->setText(QString::number((double)data16 / 100, 'f', 2) + "V");
     // 读取编码器电池电压
-//    jointGetBAT_VOLT(joint, &data16, 5, NULL);
     jointGet(BAT_VOLT, 2, (Joint *)joint, (void *)&data16, 50, NULL);
     uiSetAndHealth->bATVoltLineEdit->setText(QString::number((double)data16 / 100, 'f', 2) + "V");
     // 更新三轴加速度,并显示
-//    jointGetACC_X(joint, &data16, 5, NULL);
     jointGet(ACC_X, 2, (Joint *)joint, (void *)&data16, 50, NULL);
     uiSetAndHealth->accXLineEdit->setText(QString::number((short)data16) + "mg");
-//    jointGetACC_Y(joint, &data16, 5, NULL);
     jointGet(ACC_Y, 2, (Joint *)joint, (void *)&data16, 50, NULL);
     uiSetAndHealth->accYLineEdit->setText(QString::number((short)data16) + "mg");
-//    jointGetACC_Z(joint, &data16, 5, NULL);
     jointGet(ACC_Z, 2, (Joint *)joint, (void *)&data16, 50, NULL);
     uiSetAndHealth->accZLineEdit->setText(QString::number((short)data16) + "mg");
     // 更新编码器,并显示
-//    jointGetMOT_MT_DAT(joint,&data16, 5, NULL);
     jointGet(MOT_MT_DAT, 2, (Joint *)joint, (void *)&data16, 50, NULL);
     uiSetAndHealth->m_TurnLineEdit->setText(QString::number((short)data16));
-//    jointGetMOT_ST_DAT(joint, &data16, 5, NULL);
     jointGet(MOT_ST_DAT, 2, (Joint *)joint, (void *)&data16, 50, NULL);
     uiSetAndHealth->s_TurnLineEdit->setText(QString::number((double)data16 * 360.0/65536.0) + "°");
+    // 更新错误码，并显示
+    jointGet(SYS_ERROR, 2, (Joint *)joint, (void *)&data_L, 50, NULL);
+    // 按错误码显示文字
+    uiSetAndHealth->errorTextEdit->clear();
+    if (data_L & ERROR_MASK_OVER_CURRENT) {
+      uiSetAndHealth->errorTextEdit->append("过流，错误码0x0001\n");
+    }
+    if (data_L & ERROR_MASK_OVER_VOLTAGE) {
+      uiSetAndHealth->errorTextEdit->append("过压，错误码0x0002\n");
+    }
+    if (data_L & ERROR_MASK_UNDER_VOLTAGE) {
+      uiSetAndHealth->errorTextEdit->append("欠压，错误码0x0004\n");
+    }
+    if (data_L & ERROR_MASK_OVER_TEMP) {
+      uiSetAndHealth->errorTextEdit->append("过温，错误码0x0008\n");
+    }
+    if (data_L & ERROR_MASK_BATTERY) {
+      uiSetAndHealth->errorTextEdit->append("编码器电池错误，错误码0x0010\n");
+    }
+    if (data_L & ERROR_MASK_ENCODER) {
+      uiSetAndHealth->errorTextEdit->append("码盘错误，错误码0x0020\n");
+    }
+    if (data_L & ERROR_MASK_POTEN) {
+      uiSetAndHealth->errorTextEdit->append("电位器错误，错误码0x0040\n");
+    }
+    if (data_L & ERROR_MASK_CURRENT_INIT) {
+      uiSetAndHealth->errorTextEdit->append("电流检测错误，错误码0x0080\n");
+    }
+    if (data_L & ERROR_MASK_FUSE) {
+      uiSetAndHealth->errorTextEdit->append("保险丝断开错误，错误码0x0100\n");
+    }
+    if (data_L == 0) {
+      uiSetAndHealth->errorTextEdit->append("No Error\n");
+    }
 }
 
 void SetAndHealth::on_IDPushButton_clicked()
@@ -204,4 +233,9 @@ void SetAndHealth::on_clearErrorButton_clicked()
     }
     jointSetClearError(joint, 100, NULL);
     qDebug() << tr("SetAndHealth::on_clearErrorButton_clicked(): done.");
+}
+
+void SetAndHealth::on_updateButton_clicked()
+{
+    this->myTimerSlot();
 }

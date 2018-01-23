@@ -61,6 +61,7 @@ void Widget::widgetInit()
     connect(bottom, &Bottom::cmbIDChanged, setAndHealth, &SetAndHealth::SetAndHealthIint);
     connect(bottom, &Bottom::cmbIDChanged, oscilloScope, &OscilloScope::OscilloScopeInitialize);
     connect(this, &Widget::widgetAllReady, bottom, &Bottom::waitingForWidgetReady);
+    connect(this, SIGNAL(destroyed(QObject*)), move, SLOT(ClickStopButton()));
     connect(setAndHealth, &SetAndHealth::ZeroPositionSeted, move, &Move::ClickStopButton);
 
     emit widgetAllReady();

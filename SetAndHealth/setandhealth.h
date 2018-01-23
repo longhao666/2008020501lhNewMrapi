@@ -44,6 +44,8 @@ private slots:
 
     void on_clearErrorButton_clicked();
 
+    void on_updateButton_clicked();
+
 private:
     Ui::SetAndHealth *uiSetAndHealth;
     JOINT_HANDLE joint;

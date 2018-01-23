@@ -10,12 +10,10 @@
 #include <Windows.h>
 #endif
 #include "mrapi.h"
-#ifndef LOG_LEVEL
+
+#define LOG_MSG_ON
 #define LOG_LEVEL 1
-#endif
-#ifndef LOG_APPEND
-#define LOG_APPEND 1
-#endif
+#define LOG_APPEND 0
 
 #define PLOG(level, ...) \
     {						\

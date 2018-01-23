@@ -109,8 +109,9 @@ void Bottom::on_btnUpdateID_clicked()
 #endif
     if(!isCANInitialSucceed) {
         isCANInitialSucceed = true;
+        char str[] = "pcanusb1";
         qDebug("===============");
-        int re = startMaster(0);
+        int re = startMaster(str, 0);
         qDebug() << re << "startMaster(0)";
     }
     uiBottom->cmbID->clear();
@@ -118,7 +119,7 @@ void Bottom::on_btnUpdateID_clicked()
     JOINT_HANDLE tempj = NULL;
     uint16_t ID = 0;
     for(int i=1;i<MAX_JOINTS+1;i++) {
-        tempj = jointUp(i, masterLoadSendFunction(0));
+        tempj = jointUp(i, 0);
         if(tempj) {
             int re = jointGetId(tempj, &ID, 100, NULL);
             vectID.push_back(ID);
@@ -190,7 +191,7 @@ void Bottom::on_cmbID_currentIndexChanged(int index)
         return ;
     }
     int jointID = uiBottom->cmbID->currentText().toInt();
-#if 1
+#if 0
     qDebug() << "jointID  = " << jointID << "index = " << index;
 #endif
     emit cmbIDChanged(jointID);
