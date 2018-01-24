@@ -154,15 +154,6 @@ void OscilloScopeThread::getData()
     if (JT->joint == NULL) {
         return;
     }
-//    vector<uint16_t> addrValue;
-//    for (unsigned int i = 0; i < paintArea->showItems.size(); i++) {
-//        uint16_t data_L = 0;
-//        uint16_t data_H = 0;
-//        jointGetSCP_MASK_Addr_Value(JT->joint, &data_L, paintArea->showItems[i].Item, 10, NULL);
-//        jointGetSCP_MASK_Addr_Value(JT->joint, &data_H, paintArea->showItems[i].Item + 1, 10, NULL);
-//        addrValue.push_back(data_L);
-//        addrValue.push_back(data_H);
-//    }
 //    qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss:zzz");
 
     // 示波器绘制曲线使能开启

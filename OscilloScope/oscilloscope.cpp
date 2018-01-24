@@ -144,14 +144,14 @@ void OscilloScope::OscilloScopeInitialize(int ID)
     // 记录对象标志MASK的初始化
     jointGet(SCP_MASK, 2, (Joint *)joint, (void *)&data_L, 50, NULL);
     osthread->paintArea->Mask = data_L;
-#if 0
+#if 1
     qDebug() << "data_L" << data_L << "osthread->paintArea->Mask" << osthread->paintArea->Mask;
 #endif
     //参数表中的“记录时间间隔（对10kHZ的分频值）”显示到测量条件选项卡中的对应控件里
     //    jointGetSCP_REC_TIM(joint, &data_L, 100, NULL);
     jointGet(SCP_REC_TIM, 2, (Joint *)joint, (void *)&data_L, 50, NULL);
     osthread->paintArea->ScanFrequency = data_L;
-#if 0
+#if 1
     qDebug() << "data_L" << data_L << "osthread->paintArea->ScanFrequency" << osthread->paintArea->ScanFrequency;
 #endif
     uiOscilloScope->ScanFrequencyComboBox->setVisible(false); // 扫描频率设置改为不可见

@@ -61,7 +61,8 @@ void Move::moveInit(int ID)
         return ;
     }
     uint16_t work;
-    jointGetMode(joint, &work, 50, NULL);
+//    jointGetMode(joint, &work, 50, NULL);
+    jointGet(TAG_WORK_MODE, 4, (Joint *)joint, (void *)&work, 50, NULL);
     uiMove->cmbWorkMode->setCurrentIndex(work);
     // 防止没有调用on_cmbWorkMode_currentIndexChanged()，强制运行下列2个函数
     // 工作模式更新bias
@@ -462,8 +463,6 @@ void Move::on_stopButton_clicked()
     }
     case MODE_POSITION: {
         int value = 0;
-//        jointGetTAG_POSITION_L(joint, &data, 50, NULL);
-//        jointSetTAG_POSITION_L(joint, data, 50, NULL);
         jointGet(SYS_POSITION_L, 4, (Joint *)joint, (void *)&value, 50, NULL);
         jointSet(TAG_POSITION_L, 4, (Joint *)joint, (void *)&value, 50, NULL);
         break;

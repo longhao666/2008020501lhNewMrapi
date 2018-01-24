@@ -180,10 +180,10 @@ void Pid::showMaxLimit()
 #endif
     uint16_t data16 = 0;
     // 最大加速度
-    jointGetMaxAcceleration(joint, &data16, 100, NULL);
+    jointGet(LIT_MAX_ACC, 2, (Joint *)joint, (void *)&data16, 50, NULL);
     uiPid->maxAccLineEdit->setText(QString::number(data16, 10));
     // 最大速度
-    jointGetMaxSpeed(joint, &data16, 100, NULL);
+    jointGet(LIT_MAX_SPEED, 2, (Joint *)joint, (void *)&data16, 50, NULL);
     uiPid->maxSpdLineEdit->setText(QString::number(data16, 10));
 
     jointGet(LIT_MAX_CURRENT, 2, (Joint *)joint, (void *)&data16, 50, NULL);

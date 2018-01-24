@@ -64,7 +64,8 @@ void Bottom::updateWorkModePushButton()
     uint16_t workMode = 0;
 //    QString workModePushButtonStr = "background-color:green";
     uiBottom->workModePushButton->setStyleSheet("background-color:green");
-    jointGetMode(joint, &workMode, 50, NULL);
+//    jointGetMode(joint, &workMode, 50, NULL);
+    jointGet(TAG_WORK_MODE, 2, (Joint *)joint, (void *)&workMode, 50, NULL);
     switch (workMode) {
     case 0:
         uiBottom->workModePushButton->setText("OPEN");
@@ -121,7 +122,8 @@ void Bottom::on_btnUpdateID_clicked()
     for(int i=1;i<MAX_JOINTS+1;i++) {
         tempj = jointUp(i, 0);
         if(tempj) {
-            int re = jointGetId(tempj, &ID, 100, NULL);
+//            int re = jointGetId(tempj, &ID, 100, NULL);
+            int re = jointGet(SYS_ID, 2, (Joint *)tempj, (void *)&ID, 100, NULL);
             vectID.push_back(ID);
             qDebug() << "发现这个ID:" << ID << re;
         }
@@ -168,7 +170,9 @@ void Bottom::on_btnFlash_clicked()
     if(!joint) {
         return ;
     }
-    jointSetSave2Flash(joint, 50, NULL);
+//    jointSetSave2Flash(joint, 50, NULL);
+    uint16_t value = 1;
+    jointSet(SYS_SAVE_TO_FLASH, 2, (Joint *)joint, (void *)&value, 50, NULL);
     QMessageBox::information(this, tr("information"), tr("    Succeed     "), QMessageBox::Ok);
 }
 
@@ -191,7 +195,7 @@ void Bottom::on_cmbID_currentIndexChanged(int index)
         return ;
     }
     int jointID = uiBottom->cmbID->currentText().toInt();
-#if 0
+#if 1
     qDebug() << "jointID  = " << jointID << "index = " << index;
 #endif
     emit cmbIDChanged(jointID);
@@ -202,7 +206,8 @@ void Bottom::on_cmbID_currentIndexChanged(int index)
     }
     slotTimerBottomDone();
     uint16_t data16 = 0;
-    jointGetType(joint, &data16, 50, NULL);
+//    jointGetType(joint, &data16, 50, NULL);
+    jointGet(SYS_MODEL_TYPE, 2, (Joint *)joint, (void *)&data16, 50, NULL);
     //#define MODEL_TYPE_M14        0x010
     //#define MODEL_TYPE_M17        0x020
     //#define MODEL_TYPE_M17V2      0x021
