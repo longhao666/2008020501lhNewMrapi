@@ -15,7 +15,7 @@ class MOVESHARED_EXPORT Move : public QWidget
 {
     Q_OBJECT
 public:
-
+    JOINT_HANDLE joint;
 
 public:
     Move(QWidget *parent = 0);
@@ -45,7 +45,7 @@ private slots:
 
 private:
     Ui::Move *uiMove;
-    JOINT_HANDLE joint;
+
     bool enableRun;
     QTimer *timerMove;
     double bias;

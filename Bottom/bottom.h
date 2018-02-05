@@ -16,6 +16,7 @@ class BOTTOMSHARED_EXPORT Bottom : public QWidget
 {
     Q_OBJECT
 public:
+    JOINT_HANDLE joint;
 
 public:
     Bottom(QWidget *parent = 0);
@@ -27,6 +28,7 @@ public slots:
 
 signals:
     void cmbIDChanged(int ID);
+    void cmbIDJoint(JOINT_HANDLE joint);
 
 
 private:
@@ -44,10 +46,11 @@ private slots:
     void on_cmbID_currentIndexChanged(int index);
     void slotTimerBottomDone();
 
+    void on_btnQuit_clicked();
 
 private:
     Ui::Bottom *uiBottom;
-    JOINT_HANDLE joint;
+
     bool isCANInitialSucceed;
     QTimer *timerBottom;
 };

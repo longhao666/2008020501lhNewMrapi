@@ -32,6 +32,7 @@ signals:
 
 private:
     void widgetInit();
+    void jointQuit(JOINT_HANDLE joint);
 
 private:
     Ui::Widget *ui;

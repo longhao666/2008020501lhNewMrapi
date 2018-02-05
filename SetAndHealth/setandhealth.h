@@ -15,6 +15,7 @@ class SETANDHEALTHSHARED_EXPORT SetAndHealth : public QWidget
 {
     Q_OBJECT
 public:
+    JOINT_HANDLE joint;
 
 public:
     SetAndHealth(QWidget *parent = 0);
@@ -41,7 +42,6 @@ private slots:
 
 private:
     Ui::SetAndHealth *uiSetAndHealth;
-    JOINT_HANDLE joint;
     QTimer *timer;
 };
 
