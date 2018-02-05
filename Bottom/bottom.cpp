@@ -108,13 +108,17 @@ void Bottom::on_btnUpdateID_clicked()
 #if LHDEBUG
     qDebug() <<__DATE__<<__TIME__<<__FILE__<<__LINE__<<__func__;
 #endif
-    if(!isCANInitialSucceed) {
-        isCANInitialSucceed = true;
-        char str[] = "pcanusb1";
-        qDebug("===============");
-        int re = startMaster(str, 0);
-        qDebug() << re << "startMaster(0)";
-    }
+//    if(!isCANInitialSucceed) {
+//        isCANInitialSucceed = true;
+//        char str[] = "pcanusb1";
+//        qDebug("===============");
+//        int re = startMaster(str, 0);
+//        qDebug() << re << "startMaster(0)";
+//    }
+    char str[] = "pcanusb1";
+    qDebug("===============");
+    int re = startMaster(str, 0);
+    qDebug() << re << "startMaster(0)";
     uiBottom->cmbID->clear();
     vector<uint32_t> vectID;
     JOINT_HANDLE tempj = NULL;
@@ -256,4 +260,18 @@ void Bottom::slotTimerBottomDone()
     updateIfError();
 }
 
-
+void Bottom::on_btnQuit_clicked()
+{
+//    return ;
+#if 0 // 必须先给空才能清空内存,因为有定时器一直在用joint
+    int re = jointDown(joint);
+    qDebug() << "re = " << re << "on_btnQuit_clicked";
+    if(re == 0) {
+        emit cmbIDJoint();
+    }else {
+        qDebug() << " failed! ";
+    }
+#endif
+    qDebug() << joint;
+    emit cmbIDJoint(joint);
+}

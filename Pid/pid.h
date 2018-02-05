@@ -14,7 +14,7 @@ class PIDSHARED_EXPORT Pid : public QWidget
     Q_OBJECT
 
 public:
-
+    JOINT_HANDLE joint;
 
 public:
     Pid(QWidget *parent = 0);
@@ -53,7 +53,7 @@ private slots:
 
 private:
     Ui::Pid *uiPid;
-    JOINT_HANDLE joint;
+
 };
 
 
